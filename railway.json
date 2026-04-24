@@ -1,0 +1,31 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "NIXPACKS",
+    "nixpacksPlan": {
+      "phases": {
+        "install": {
+          "dependsOn": ["setup", "node"],
+          "cmds": [
+            "composer install --no-dev --optimize-autoloader",
+            "npm install",
+            "npm run build"
+          ]
+        }
+      },
+      "packages": [
+        "chromium"
+      ]
+    }
+  },
+  "deploy": {
+    "startCommand": "php artisan migrate --force && php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan serve --host 0.0.0.0 --port $PORT",
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10,
+    "env": {
+      "RAILWAY_ENVIRONMENT": "true",
+      "CHROME_BIN": "/usr/bin/chromium",
+      "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true"
+    }
+  }
+}

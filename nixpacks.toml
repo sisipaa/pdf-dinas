@@ -1,0 +1,26 @@
+[phases.setup]
+nixPkgs = ["php", "phpExtensions.pdo_mysql", "composer", "nginx", "chromium"]
+
+[phases.install]
+cmds = [
+    "composer install --no-dev --optimize-autoloader",
+    "npm install",
+    "npm run build"
+]
+
+[phases.build]
+cmds = [
+    "cp .env.example .env || true",
+    "php artisan key:generate --force || true",
+    "php artisan config:cache",
+    "php artisan route:cache",
+    "php artisan view:cache"
+]
+
+[start]
+cmd = "php artisan migrate --force && php artisan serve --host 0.0.0.0 --port $PORT"
+
+[environment]
+CHROME_BIN = "/usr/bin/chromium"
+PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = "true"
+RAILWAY_ENVIRONMENT = "true"
