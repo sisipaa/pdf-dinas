@@ -46,8 +46,8 @@ DB_SSLMODE=require
 # ATAU gunakan DATABASE_URL (pilih salah satu):
 DATABASE_URL=postgresql://postgres.oeovodmldkhhvmbfwgdt:<password>@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?sslmode=require
 
-# Session & Cache (gunakan database)
-SESSION_DRIVER=database
+# Session & Cache - PENTING: Gunakan 'file' agar tidak perlu migrate session table!
+SESSION_DRIVER=file
 SESSION_LIFETIME=120
 SESSION_SECURE_COOKIE=true
 
@@ -62,6 +62,12 @@ LOG_LEVEL=debug
 PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 CHROME_BIN=/usr/bin/chromium
 ```
+
+### ⚠️ PENTING - Session Driver
+
+**JANGAN gunakan `SESSION_DRIVER=database`** kecuali Anda sudah yakin migration sudah jalan.
+
+Gunakan `SESSION_DRIVER=file` untuk menghindari masalah session table yang belum ter-create.
 
 ### ⚠️ PENTING - Password Database
 
