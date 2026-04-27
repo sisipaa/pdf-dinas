@@ -170,11 +170,16 @@ class TripController extends Controller
                 '--disable-setuid-sandbox',
                 '--disable-accelerated-2d-canvas',
                 '--disable-gpu',
+                '--disable-web-security',
+                '--ignore-certificate-errors',
             ]);
 
         // Check jika running di Railway
         if (env('RAILWAY_ENVIRONMENT')) {
-            $browsershot->setChromePath('/usr/bin/chromium');
+            $browsershot
+                ->setChromePath('/usr/bin/chromium')
+                ->setIncludePath('/usr/bin/:/usr/local/bin/')
+                ->noSandbox();
         }
 
         return $browsershot;
@@ -182,62 +187,84 @@ class TripController extends Controller
 
     public function generatePdfDalamNegeri($id)
     {
-        $trip = Trip::findOrFail($id);
+        try {
+            $trip = Trip::findOrFail($id);
 
-        $html = view('trips.dalam-negeri.pdf', compact('trip'))->render();
+            $html = view('trips.dalam-negeri.pdf', compact('trip'))->render();
 
-        $filename = 'surat_dinas_dalam_negeri_' . $trip->id . '_' . time() . '.pdf';
-        $pdfPath = storage_path('app/public/pdfs/' . $filename);
+            $filename = 'surat_dinas_dalam_negeri_' . $trip->id . '_' . time() . '.pdf';
+            $pdfPath = storage_path('app/public/pdfs/' . $filename);
 
-        // Pastikan direktori ada
-        $dir = dirname($pdfPath);
-        if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
+            // Pastikan direktori ada
+            $dir = dirname($pdfPath);
+            if (!is_dir($dir)) {
+                mkdir($dir, 0755, true);
+            }
+
+            // Generate PDF dengan Browsershot
+            $this->getBrowsershot()
+                ->setHtml($html)
+                ->paperSize(210, 297) // A4 in mm
+                ->margin(20, 20, 20, 20) // mm: top, right, bottom, left
+                ->save($pdfPath);
+
+            $trip->update(['file_pdf' => 'pdfs/' . $filename]);
+
+            return response()->file($pdfPath, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . $filename . '"',
+            ]);
+        } catch (\Exception $e) {
+            // Log error untuk debugging
+            \Log::error('PDF Generation Error: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+
+            return response()->json([
+                'error' => 'Failed to generate PDF',
+                'message' => env('APP_DEBUG', false) ? $e->getMessage() : 'An error occurred while generating the PDF',
+            ], 500);
         }
-
-        // Generate PDF dengan Browsershot
-        $this->getBrowsershot()
-            ->setHtml($html)
-            ->paperSize(210, 297) // A4 in mm
-            ->margin(20, 20, 20, 20) // mm: top, right, bottom, left
-            ->save($pdfPath);
-
-        $trip->update(['file_pdf' => 'pdfs/' . $filename]);
-
-        return response()->file($pdfPath, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="' . $filename . '"',
-        ]);
     }
 
     public function generatePdfLuarNegeri($id)
     {
-        $trip = Trip::findOrFail($id);
+        try {
+            $trip = Trip::findOrFail($id);
 
-        $html = view('trips.luar-negeri.pdf', compact('trip'))->render();
+            $html = view('trips.luar-negeri.pdf', compact('trip'))->render();
 
-        $filename = 'surat_dinas_luar_negeri_' . $trip->id . '_' . time() . '.pdf';
-        $pdfPath = storage_path('app/public/pdfs/' . $filename);
+            $filename = 'surat_dinas_luar_negeri_' . $trip->id . '_' . time() . '.pdf';
+            $pdfPath = storage_path('app/public/pdfs/' . $filename);
 
-        // Pastikan direktori ada
-        $dir = dirname($pdfPath);
-        if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
+            // Pastikan direktori ada
+            $dir = dirname($pdfPath);
+            if (!is_dir($dir)) {
+                mkdir($dir, 0755, true);
+            }
+
+            // Generate PDF dengan Browsershot
+            $this->getBrowsershot()
+                ->setHtml($html)
+                ->paperSize(210, 297) // A4 in mm
+                ->margin(20, 20, 20, 20) // mm: top, right, bottom, left
+                ->save($pdfPath);
+
+            $trip->update(['file_pdf' => 'pdfs/' . $filename]);
+
+            return response()->file($pdfPath, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . $filename . '"',
+            ]);
+        } catch (\Exception $e) {
+            // Log error untuk debugging
+            \Log::error('PDF Generation Error (Luar Negeri): ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+
+            return response()->json([
+                'error' => 'Failed to generate PDF',
+                'message' => env('APP_DEBUG', false) ? $e->getMessage() : 'An error occurred while generating the PDF',
+            ], 500);
         }
-
-        // Generate PDF dengan Browsershot
-        $this->getBrowsershot()
-            ->setHtml($html)
-            ->paperSize(210, 297) // A4 in mm
-            ->margin(20, 20, 20, 20) // mm: top, right, bottom, left
-            ->save($pdfPath);
-
-        $trip->update(['file_pdf' => 'pdfs/' . $filename]);
-
-        return response()->file($pdfPath, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="' . $filename . '"',
-        ]);
     }
 
     public function downloadPdf($id)
