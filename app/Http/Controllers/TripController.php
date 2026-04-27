@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Trip;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Spatie\Browsershot\Browsershot;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TripController extends Controller
 {
@@ -157,32 +157,26 @@ class TripController extends Controller
     }
 
     /**
-     * Configure Browsershot untuk Railway deployment
+     * Generate PDF menggunakan DOMPDF (lebih reliable di Railway)
      */
-    private function getBrowsershot(): Browsershot
+    private function generatePdf($html, $filename)
     {
-        $browsershot = Browsershot::html('')
-            ->setOption('viewport.width', 1920)
-            ->setOption('viewport.height', 1080)
-            ->addChromiumArguments([
-                '--no-sandbox',
-                '--disable-dev-shm-usage',
-                '--disable-setuid-sandbox',
-                '--disable-accelerated-2d-canvas',
-                '--disable-gpu',
-                '--disable-web-security',
-                '--ignore-certificate-errors',
-            ]);
+        $pdf = Pdf::loadHTML($html)
+            ->setPaper('a4')
+            ->setMargin(20);
 
-        // Check jika running di Railway
-        if (env('RAILWAY_ENVIRONMENT')) {
-            $browsershot
-                ->setChromePath('/usr/bin/chromium')
-                ->setIncludePath('/usr/bin/:/usr/local/bin/')
-                ->noSandbox();
+        // Simpan ke storage
+        $pdfPath = storage_path('app/public/pdfs/' . $filename);
+
+        // Pastikan direktori ada
+        $dir = dirname($pdfPath);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
         }
 
-        return $browsershot;
+        $pdf->save($pdfPath);
+
+        return $pdfPath;
     }
 
     public function generatePdfDalamNegeri($id)
@@ -193,20 +187,9 @@ class TripController extends Controller
             $html = view('trips.dalam-negeri.pdf', compact('trip'))->render();
 
             $filename = 'surat_dinas_dalam_negeri_' . $trip->id . '_' . time() . '.pdf';
-            $pdfPath = storage_path('app/public/pdfs/' . $filename);
 
-            // Pastikan direktori ada
-            $dir = dirname($pdfPath);
-            if (!is_dir($dir)) {
-                mkdir($dir, 0755, true);
-            }
-
-            // Generate PDF dengan Browsershot
-            $this->getBrowsershot()
-                ->setHtml($html)
-                ->paperSize(210, 297) // A4 in mm
-                ->margin(20, 20, 20, 20) // mm: top, right, bottom, left
-                ->save($pdfPath);
+            // Generate PDF dengan DOMPDF
+            $pdfPath = $this->generatePdf($html, $filename);
 
             $trip->update(['file_pdf' => 'pdfs/' . $filename]);
 
@@ -234,20 +217,9 @@ class TripController extends Controller
             $html = view('trips.luar-negeri.pdf', compact('trip'))->render();
 
             $filename = 'surat_dinas_luar_negeri_' . $trip->id . '_' . time() . '.pdf';
-            $pdfPath = storage_path('app/public/pdfs/' . $filename);
 
-            // Pastikan direktori ada
-            $dir = dirname($pdfPath);
-            if (!is_dir($dir)) {
-                mkdir($dir, 0755, true);
-            }
-
-            // Generate PDF dengan Browsershot
-            $this->getBrowsershot()
-                ->setHtml($html)
-                ->paperSize(210, 297) // A4 in mm
-                ->margin(20, 20, 20, 20) // mm: top, right, bottom, left
-                ->save($pdfPath);
+            // Generate PDF dengan DOMPDF
+            $pdfPath = $this->generatePdf($html, $filename);
 
             $trip->update(['file_pdf' => 'pdfs/' . $filename]);
 
