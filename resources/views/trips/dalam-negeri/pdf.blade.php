@@ -2,7 +2,6 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Surat Perjalanan Dinas Dalam Negeri</title>
     <style>
         * {
@@ -14,17 +13,17 @@
         body {
             font-family: 'Times New Roman', Times, serif;
             font-size: 12pt;
-            line-height: 1.4;
+            line-height: 1.5;
             color: #000;
-            padding: 20mm;
+            padding: 15mm 20mm;
         }
 
         /* Kop Surat */
         .kop-surat {
             text-align: center;
-            border-bottom: 4px solid #000;
-            padding-bottom: 8px;
-            margin-bottom: 20px;
+            border-bottom: 3px solid #000;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
         }
 
         .kop-surat h1 {
@@ -32,31 +31,31 @@
             font-weight: bold;
             text-transform: uppercase;
             margin: 0;
-            line-height: 1.2;
+            line-height: 1.3;
         }
 
         .kop-surat h2 {
             font-size: 13pt;
             font-weight: bold;
             text-transform: uppercase;
-            margin: 4px 0;
-            line-height: 1.2;
+            margin: 3px 0;
+            line-height: 1.3;
         }
 
         .kop-surat .alamat {
-            font-size: 11pt;
-            margin: 4px 0;
+            font-size: 10pt;
+            margin: 3px 0;
         }
 
         .kop-surat .kontak {
-            font-size: 10pt;
+            font-size: 9pt;
             margin: 2px 0;
         }
 
         /* Judul Surat */
         .judul-surat {
             text-align: center;
-            margin: 20px 0;
+            margin: 15px 0;
         }
 
         .judul-surat h3 {
@@ -69,12 +68,12 @@
 
         .judul-surat .nomor-surat {
             font-size: 11pt;
-            margin: 4px 0;
+            margin: 3px 0;
         }
 
         /* Isi Surat - Tabel Data */
         .isi-surat {
-            margin: 20px 0;
+            margin: 15px 0;
         }
 
         .isi-surat table {
@@ -83,22 +82,23 @@
         }
 
         .isi-surat table td {
-            padding: 4px 0;
+            padding: 3px 0;
             vertical-align: top;
+            font-size: 11pt;
         }
 
         .isi-surat table td.label {
-            width: 220px;
+            width: 200px;
         }
 
         .isi-surat table td.separator {
-            width: 15px;
+            width: 10px;
             text-align: center;
         }
 
         /* Rincian Biaya */
         .rincian-biaya {
-            margin-top: 25px;
+            margin-top: 20px;
         }
 
         .rincian-biaya h4 {
@@ -106,23 +106,24 @@
             font-weight: bold;
             text-transform: uppercase;
             text-decoration: underline;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            text-align: center;
         }
 
         .rincian-biaya table {
             width: 100%;
             border-collapse: collapse;
-            border: 1px solid #000;
         }
 
         .rincian-biaya table th,
         .rincian-biaya table td {
             border: 1px solid #000;
-            padding: 6px 8px;
+            padding: 5px 6px;
+            font-size: 10pt;
         }
 
         .rincian-biaya table th {
-            background-color: #e8e8e8;
+            background-color: #f0f0f0;
             font-weight: bold;
             text-align: center;
         }
@@ -145,14 +146,14 @@
         }
 
         .terbilang {
-            margin-top: 10px;
+            margin-top: 8px;
             font-style: italic;
-            font-size: 11pt;
+            font-size: 10pt;
         }
 
         /* Tanda Tangan */
         .tanda-tangan {
-            margin-top: 35px;
+            margin-top: 25px;
             width: 100%;
         }
 
@@ -165,6 +166,7 @@
             border: none;
             vertical-align: top;
             padding: 5px;
+            font-size: 11pt;
         }
 
         .tanda-tangan .ppk {
@@ -181,7 +183,7 @@
         }
 
         .signature-box {
-            margin-top: 70px;
+            margin-top: 60px;
             text-align: center;
         }
 
@@ -196,21 +198,29 @@
 
         /* Footer */
         .footer {
-            margin-top: 30px;
+            margin-top: 20px;
             text-align: center;
-            font-size: 10pt;
+            font-size: 9pt;
+            font-style: italic;
             color: #333;
+            border-top: 1px solid #ccc;
+            padding-top: 8px;
         }
 
         .footer p {
-            margin: 3px 0;
+            margin: 2px 0;
+        }
+
+        /* Page break avoidance */
+        .no-break {
+            page-break-inside: avoid;
         }
     </style>
 </head>
 <body>
     <!-- Kop Surat -->
     <div class="kop-surat">
-        <h1>KEMENTERIAN/LISTANSI INSTANSI</h1>
+        <h1>KEMENTERIAN/LEMBAGA INSTANSI</h1>
         <h2>DIREKTORAT JENDERAL ADMINISTRASI</h2>
         <p class="alamat">Jl. Jenderal Sudirman Kav. 1-2, Jakarta Pusat</p>
         <p class="kontak">Telepon: (021) 1234567 | Email: info@instansi.go.id</p>
@@ -223,7 +233,7 @@
     </div>
 
     <!-- Isi Surat -->
-    <div class="isi-surat">
+    <div class="isi-surat no-break">
         <table>
             <tr>
                 <td class="label">Nama</td>
@@ -284,7 +294,7 @@
     </div>
 
     <!-- Rincian Biaya -->
-    <div class="rincian-biaya">
+    <div class="rincian-biaya no-break">
         <h4>RINCIAN BIAYA PERJALANAN DINAS</h4>
         <table>
             <thead>
@@ -331,7 +341,7 @@
     </div>
 
     <!-- Tanda Tangan -->
-    <div class="tanda-tangan">
+    <div class="tanda-tangan no-break">
         <table>
             <tr>
                 <td class="ppk" width="50%">

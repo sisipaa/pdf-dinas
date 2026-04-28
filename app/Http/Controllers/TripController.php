@@ -6,6 +6,7 @@ use App\Models\Trip;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 
 class TripController extends Controller
 {
@@ -157,13 +158,22 @@ class TripController extends Controller
     }
 
     /**
-     * Generate PDF menggunakan DOMPDF (lebih reliable di Railway)
+     * Generate PDF menggunakan DOMPDF (compatible dengan Railway)
      */
     private function generatePdf($html, $filename)
     {
-        $pdf = Pdf::loadHTML($html)
-            ->setPaper('a4')
-            ->setMargin(20);
+        $pdf = Pdf::loadHTML($html, [
+            'defaultFont' => 'Times New Roman',
+            'defaultPaperSize' => 'a4',
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+        ]);
+
+        $pdf->setPaper('a4')
+            ->setOption('margin-top', 20)
+            ->setOption('margin-right', 20)
+            ->setOption('margin-bottom', 20)
+            ->setOption('margin-left', 20);
 
         // Simpan ke storage
         $pdfPath = storage_path('app/public/pdfs/' . $filename);
