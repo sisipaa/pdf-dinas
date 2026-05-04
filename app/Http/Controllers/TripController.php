@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class TripController extends Controller
 {
@@ -23,19 +24,101 @@ class TripController extends Controller
         return config('uang-harian.luar_negeri');
     }
 
-    private function getUangHarianPerHari($tujuan, $type)
+    /**
+     * Get uang harian per hari untuk dalam negeri
+     * @param string $tujuan Provinsi tujuan
+     * @param string $tipePerjalanan 'luar_kota' atau 'dalam_kota'
+     */
+    private function getUangHarianDalamNegeriPerHari($tujuan, $tipePerjalanan = 'luar_kota')
     {
-        if ($type === 'dalam_negeri') {
-            return config('uang-harian.dalam_negeri')[$tujuan] ?? config('uang-harian.default_dalam_negeri');
+        $data = config('uang-harian.dalam_negeri')[$tujuan] ?? null;
+        
+        if ($data) {
+            return $tipePerjalanan === 'dalam_kota' ? $data['dalam_kota'] : $data['luar_kota'];
         }
-        return config('uang-harian.luar_negeri')[$tujuan] ?? config('uang-harian.default_luar_negeri');
+        
+        return config('uang-harian.default_dalam_negeri_luar_kota', 370000);
+    }
+
+    /**
+     * Get uang harian per hari untuk luar negeri berdasarkan golongan
+     * @param string $negara Negara tujuan
+     * @param string $golongan Golongan pegawai (I, II, III, IV)
+     */
+    private function getUangHarianLuarNegeriPerHari($negara, $golongan)
+    {
+        $data = config('uang-harian.luar_negeri')[$negara] ?? null;
+        
+        // Mapping golongan ke kategori (A/B/C/D)
+        $golonganToKategori = config('uang-harian.golongan_to_kategori', []);
+        preg_match('/([I|V]+)/', $golongan, $matches);
+        $golonganAngka = $matches[1] ?? 'III';
+        $kategori = $golonganToKategori[$golonganAngka] ?? config('uang-harian.default_golongan_kategori', 'C');
+        
+        if ($data && isset($data[$kategori])) {
+            return $data[$kategori];
+        }
+        
+        return config('uang-harian.default_luar_negeri', 300);
+    }
+
+    /**
+     * Get provinsi dari kota tujuan
+     */
+    private function getProvinsiFromKota($kota)
+    {
+        return config('uang-harian.kota_to_provinsi')[$kota] ?? null;
+    }
+
+    /**
+     * Get biaya taxi tujuan berdasarkan provinsi
+     */
+    private function getTaxiTujuanBiaya($provinsi)
+    {
+        return config('uang-harian.taxi_tujuan')[$provinsi] ?? 0;
+    }
+
+    /**
+     * Get uang representasi berdasarkan jabatan dan tipe perjalanan
+     * @param string $eselonJabatan
+     * @param string $tipePerjalanan 'luar_kota' atau 'dalam_kota'
+     */
+    private function getUangRepresentasi($eselonJabatan, $tipePerjalanan = 'luar_kota')
+    {
+        $uangRepresentasi = config('uang-harian.uang_representasi');
+        
+        // Mapping jabatan ke key config
+        $jabatanKey = null;
+        if ($eselonJabatan === 'Eselon I') {
+            $jabatanKey = 'Eselon I';
+        } elseif ($eselonJabatan === 'Eselon II') {
+            $jabatanKey = 'Eselon II';
+        } elseif (in_array($eselonJabatan, ['Pejabat Negara', 'Wakil Menteri'])) {
+            $jabatanKey = 'Pejabat Negara/Wakil Menteri';
+        }
+        
+        if ($jabatanKey && isset($uangRepresentasi[$jabatanKey])) {
+            return $tipePerjalanan === 'dalam_kota' ? $uangRepresentasi[$jabatanKey]['dalam_kota'] : $uangRepresentasi[$jabatanKey]['luar_kota'];
+        }
+        
+        return 0;
+    }
+
+    /**
+     * Get biaya transport antar kabupaten sekitar Jakarta
+     */
+    private function getTransportAntarKabupaten($kotaTujuan)
+    {
+        return config('uang-harian.transport_antar_kabupaten')[$kotaTujuan] ?? 0;
     }
 
     public function createDalamNegeri()
     {
-        $kotaOptions = array_keys(config('uang-harian.dalam_negeri'));
-        sort($kotaOptions);
-        return view('trips.dalam-negeri.create', compact('kotaOptions'));
+        $provinsiOptions = array_keys(config('uang-harian.dalam_negeri'));
+        sort($provinsiOptions);
+        $kabupatenOptions = array_keys(config('uang-harian.transport_antar_kabupaten'));
+        sort($kabupatenOptions);
+        return view('trips.dalam-negeri.create', compact('provinsiOptions', 'kabupatenOptions'));
     }
 
     public function storeDalamNegeri(Request $request)
@@ -48,22 +131,102 @@ class TripController extends Controller
             'pangkat' => 'required|string|max:100',
             'golongan' => 'required|string|max:50',
             'jabatan' => 'required|string|max:255',
+            'eselon_jabatan' => 'nullable|string|in:Pejabat Negara,Wakil Menteri,Eselon I,Eselon II,Staf',
             'maksud_perjalanan' => 'required|string',
             'jenis_angkutan' => 'required|in:darat,udara',
             'tempat_keberangkatan' => 'required|string|max:255',
             'tujuan' => 'required|string',
             'lama_hari' => 'required|integer|min:1',
             'tanggal_kembali' => 'required|date|after:tanggal_keberangkatan',
-            'jenis_transport' => 'nullable|in:luar kota,taxi,dalam kota',
-            'biaya_transport' => 'nullable|numeric|min:0',
+            'tipe_perjalanan' => 'nullable|in:luar_kota,dalam_kota',
+
+            // Transportasi detail
+            'transportasi_luar_kota_type' => 'nullable|in:Pesawat,Kereta,Bus,Kapal,BBM',
+            'transportasi_luar_kota_biaya' => 'nullable|numeric|min:0',
+
+            // Taxi Jakarta
+            'taxi_jakarta_type' => 'nullable|in:1 Kali Jalan,PP',
+            'taxi_jakarta_biaya' => 'nullable|numeric|min:0',
+
+            // Taxi Tujuan (otomatis)
+            'taxi_tujuan_provinsi' => 'nullable|string|max:100',
+            'taxi_tujuan_biaya' => 'nullable|numeric|min:0',
+
+            // Transportasi dalam kota Jakarta
+            'gunakan_transport_dalam_kota' => 'nullable|boolean',
+            'transport_dalam_kota_biaya' => 'nullable|numeric|min:0',
+            
+            // Transportasi antar kabupaten sekitar Jakarta
+            'gunakan_transport_antar_kabupaten' => 'nullable|boolean',
+            'tujuan_antar_kabupaten' => 'nullable|string',
+
             'biaya_hotel' => 'nullable|numeric|min:0',
         ]);
 
-        $uangHarianPerHari = $this->getUangHarianPerHari($validated['tujuan'], 'dalam_negeri');
+        $tipePerjalanan = $validated['tipe_perjalanan'] ?? 'luar_kota';
+        
+        // Hitung komponen biaya
+        $uangHarianPerHari = $this->getUangHarianDalamNegeriPerHari($validated['tujuan'], $tipePerjalanan);
         $totalUangHarian = $uangHarianPerHari * $validated['lama_hari'];
-        $biayaTransport = $validated['biaya_transport'] ?? 0;
+
+        // Transportasi luar kota (input manual)
+        $transportasiLuarKotaBiaya = $validated['transportasi_luar_kota_biaya'] ?? 0;
+
+        // Taxi Jakarta (fixed Rp274.000 x multiplier)
+        $taxiJakartaType = $validated['taxi_jakarta_type'] ?? null;
+        $taxiJakartaBiaya = 0;
+        if ($taxiJakartaType === '1 Kali Jalan') {
+            $taxiJakartaBiaya = config('uang-harian.taxi_jakarta');
+        } elseif ($taxiJakartaType === 'PP') {
+            $taxiJakartaBiaya = config('uang-harian.taxi_jakarta') * 2;
+        }
+
+        // Taxi Tujuan (otomatis berdasarkan provinsi)
+        $provinsi = $this->getProvinsiFromKota($validated['tujuan']);
+        $taxiTujuanBiaya = $provinsi ? $this->getTaxiTujuanBiaya($provinsi) : 0;
+
+        // Transportasi dalam kota Jakarta
+        $transportDalamKotaBiaya = 0;
+        if (!empty($validated['gunakan_transport_dalam_kota'])) {
+            $transportDalamKotaBiaya = config('uang-harian.transport_dalam_kota_jakarta');
+        }
+        
+        // Transportasi antar kabupaten sekitar Jakarta
+        $transportAntarKabupatenBiaya = 0;
+        if (!empty($validated['gunakan_transport_antar_kabupaten']) && !empty($validated['tujuan_antar_kabupaten'])) {
+            $transportAntarKabupatenBiaya = $this->getTransportAntarKabupaten($validated['tujuan_antar_kabupaten']);
+        }
+
+        // Total biaya transportasi
+        $totalBiayaTransport = $transportasiLuarKotaBiaya + $taxiJakartaBiaya + $taxiTujuanBiaya + $transportDalamKotaBiaya + $transportAntarKabupatenBiaya;
+
+        // Uang Representasi berdasarkan eselon jabatan
+        $eselonJabatan = $validated['eselon_jabatan'] ?? null;
+        $uangRepresentasi = $eselonJabatan ? $this->getUangRepresentasi($eselonJabatan, $tipePerjalanan) : 0;
+
+        // Biaya hotel
         $biayaHotel = $validated['biaya_hotel'] ?? 0;
-        $totalBiaya = $totalUangHarian + $biayaTransport + $biayaHotel;
+
+        // Total keseluruhan
+        $totalBiaya = $totalUangHarian + $totalBiayaTransport + $uangRepresentasi + $biayaHotel;
+
+        Log::info('Detail Biaya Dinas Dalam Negeri', [
+            'tujuan' => $validated['tujuan'],
+            'provinsi' => $provinsi,
+            'tipe_perjalanan' => $tipePerjalanan,
+            'uang_harian_per_hari' => $uangHarianPerHari,
+            'lama_hari' => $validated['lama_hari'],
+            'total_uang_harian' => $totalUangHarian,
+            'transportasi_luar_kota_biaya' => $transportasiLuarKotaBiaya,
+            'taxi_jakarta_type' => $taxiJakartaType,
+            'taxi_jakarta_biaya' => $taxiJakartaBiaya,
+            'taxi_tujuan_biaya' => $taxiTujuanBiaya,
+            'transport_dalam_kota_biaya' => $transportDalamKotaBiaya,
+            'transport_antar_kabupaten_biaya' => $transportAntarKabupatenBiaya,
+            'uang_representasi' => $uangRepresentasi,
+            'biaya_hotel' => $biayaHotel,
+            'total_biaya' => $totalBiaya,
+        ]);
 
         $trip = Trip::create([
             'user_id' => Auth::id(),
@@ -75,16 +238,25 @@ class TripController extends Controller
             'pangkat' => $validated['pangkat'],
             'golongan' => $validated['golongan'],
             'jabatan' => $validated['jabatan'],
+            'eselon_jabatan' => $eselonJabatan,
             'maksud_perjalanan' => $validated['maksud_perjalanan'],
             'jenis_angkutan' => $validated['jenis_angkutan'],
             'tempat_keberangkatan' => $validated['tempat_keberangkatan'],
             'tujuan' => $validated['tujuan'],
             'lama_hari' => $validated['lama_hari'],
             'tanggal_kembali' => $validated['tanggal_kembali'],
+            'tipe_perjalanan' => $tipePerjalanan,
             'uang_harian_per_hari' => $uangHarianPerHari,
             'total_uang_harian' => $totalUangHarian,
-            'jenis_transport' => $validated['jenis_transport'] ?? null,
-            'biaya_transport' => $biayaTransport,
+            'transportasi_luar_kota_type' => $validated['transportasi_luar_kota_type'] ?? null,
+            'transportasi_luar_kota_biaya' => $transportasiLuarKotaBiaya,
+            'taxi_jakarta_type' => $taxiJakartaType,
+            'taxi_jakarta_biaya' => $taxiJakartaBiaya,
+            'taxi_tujuan_provinsi' => $provinsi,
+            'taxi_tujuan_biaya' => $taxiTujuanBiaya,
+            'gunakan_transport_dalam_kota' => !empty($validated['gunakan_transport_dalam_kota']),
+            'transport_dalam_kota_biaya' => $transportDalamKotaBiaya,
+            'uang_representasi' => $uangRepresentasi,
             'biaya_hotel' => $biayaHotel,
             'total_biaya' => $totalBiaya,
             'mata_uang' => 'IDR',
@@ -122,11 +294,18 @@ class TripController extends Controller
             'biaya_hotel' => 'nullable|numeric|min:0',
         ]);
 
-        $uangHarianPerHari = $this->getUangHarianPerHari($validated['tujuan'], 'luar_negeri');
+        // Hitung uang harian berdasarkan golongan
+        $uangHarianPerHari = $this->getUangHarianLuarNegeriPerHari($validated['tujuan'], $validated['golongan']);
         $totalUangHarian = $uangHarianPerHari * $validated['lama_hari'];
         $biayaTransport = $validated['biaya_transport'] ?? 0;
         $biayaHotel = $validated['biaya_hotel'] ?? 0;
         $totalBiaya = $totalUangHarian + $biayaTransport + $biayaHotel;
+        
+        // Hitung kategori golongan
+        $golonganToKategori = config('uang-harian.golongan_to_kategori', []);
+        preg_match('/([I|V]+)/', $validated['golongan'], $matches);
+        $golonganAngka = $matches[1] ?? 'III';
+        $kategoriGolongan = $golonganToKategori[$golonganAngka] ?? config('uang-harian.default_golongan_kategori', 'C');
 
         $trip = Trip::create([
             'user_id' => Auth::id(),
@@ -144,6 +323,7 @@ class TripController extends Controller
             'tujuan' => $validated['tujuan'],
             'lama_hari' => $validated['lama_hari'],
             'tanggal_kembali' => $validated['tanggal_kembali'],
+            'kategori_golongan' => $kategoriGolongan,
             'uang_harian_per_hari' => $uangHarianPerHari,
             'total_uang_harian' => $totalUangHarian,
             'jenis_transport' => $validated['jenis_transport'] ?? null,
@@ -315,23 +495,33 @@ class TripController extends Controller
     {
         $type = $request->get('type', 'dalam_negeri');
         $tujuan = $request->get('tujuan');
+        $golongan = $request->get('golongan');
+        $tipePerjalanan = $request->get('tipe_perjalanan', 'luar_kota');
 
         if ($type === 'dalam_negeri') {
-            $data = config('uang-harian.dalam_negeri');
-        } else {
-            $data = config('uang-harian.luar_negeri');
-        }
-
-        if ($tujuan) {
+            if ($tujuan) {
+                $data = $this->getUangHarianDalamNegeriPerHari($tujuan, $tipePerjalanan);
+                return response()->json([
+                    'success' => true,
+                    'uang_harian' => $data,
+                ]);
+            }
             return response()->json([
                 'success' => true,
-                'uang_harian' => $data[$tujuan] ?? null,
+                'data' => config('uang-harian.dalam_negeri'),
+            ]);
+        } else {
+            if ($tujuan && $golongan) {
+                $data = $this->getUangHarianLuarNegeriPerHari($tujuan, $golongan);
+                return response()->json([
+                    'success' => true,
+                    'uang_harian' => $data,
+                ]);
+            }
+            return response()->json([
+                'success' => true,
+                'data' => config('uang-harian.luar_negeri'),
             ]);
         }
-
-        return response()->json([
-            'success' => true,
-            'data' => $data,
-        ]);
     }
 }

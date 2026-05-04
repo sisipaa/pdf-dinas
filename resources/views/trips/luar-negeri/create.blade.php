@@ -1,242 +1,248 @@
 @extends('layouts.app')
 
-@section('title', 'Dinas Luar Negeri')
+@section('title', 'Input Perjalanan Dinas Luar Negeri')
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4">
-    <div class="bg-white rounded-lg shadow-md p-8">
-        <div class="mb-6">
-            <a href="{{ route('dashboard') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">&larr; Kembali ke Dashboard</a>
-            <h1 class="text-2xl font-bold text-gray-800 mt-2">Surat Perjalanan Dinas - Luar Negeri</h1>
-        </div>
+<div style="max-width:900px; margin:auto; background:#fff; padding:20px; border-radius:8px;">
 
-        <form action="{{ route('trips.luar-negeri.store') }}" method="POST" id="tripForm">
-            @csrf
+    <h2 style="text-align:center; margin-bottom:20px;">🌏 Form Perjalanan Dinas Luar Negeri</h2>
 
-            <div class="space-y-6">
-                <!-- Informasi Pegawai -->
-                <div class="border-b pb-4">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Informasi Pegawai</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama</label>
-                            <input type="text" name="nama" value="{{ old('nama', auth()->user()->nama) }}" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
-                            <input type="text" name="nip" value="{{ old('nip', auth()->user()->nip) }}" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Pangkat</label>
-                            <input type="text" name="pangkat" value="{{ old('pangkat', auth()->user()->pangkat) }}" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Golongan</label>
-                            <input type="text" name="golongan" value="{{ old('golongan', auth()->user()->golongan) }}" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Jabatan</label>
-                            <input type="text" name="jabatan" value="{{ old('jabatan', auth()->user()->jabatan) }}" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                    </div>
-                </div>
+    <form action="{{ route('trips.luar-negeri.store') }}" method="POST">
+        @csrf
 
-                <!-- Detail Perjalanan -->
-                <div class="border-b pb-4">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Detail Perjalanan</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nomor Surat</label>
-                            <input type="text" name="nomor_surat" value="{{ old('nomor_surat') }}"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Keberangkatan</label>
-                            <input type="date" name="tanggal_keberangkatan" id="tanggal_keberangkatan" value="{{ old('tanggal_keberangkatan') }}" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Kembali</label>
-                            <input type="date" name="tanggal_kembali" id="tanggal_kembali" value="{{ old('tanggal_kembali') }}" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Lama Hari</label>
-                            <input type="number" name="lama_hari" id="lama_hari" value="{{ old('lama_hari') }}" required min="1" readonly
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Tempat Keberangkatan</label>
-                            <input type="text" name="tempat_keberangkatan" value="{{ old('tempat_keberangkatan') }}" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Negara Tujuan</label>
-                            <select name="tujuan" id="tujuan" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">Pilih Negara</option>
-                                @foreach($negaraOptions as $negara)
-                                    <option value="{{ $negara }}" data-uang-harian="{{ config('uang-harian.luar_negeri')[$negara] }}">{{ $negara }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Angkutan</label>
-                            <select name="jenis_angkutan" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">Pilih Jenis</option>
-                                <option value="darat">Darat</option>
-                                <option value="udara">Udara</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Maksud Perjalanan</label>
-                        <textarea name="maksud_perjalanan" rows="3" required
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">{{ old('maksud_perjalanan') }}</textarea>
-                    </div>
-                </div>
+        <!-- DATA PEGAWAI -->
+        <fieldset style="border:1px solid #ddd; padding:15px; margin-bottom:20px; border-radius:5px;">
+            <legend style="font-weight:bold;">📋 Data Pegawai</legend>
 
-                <!-- Biaya -->
-                <div class="border-b pb-4">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Rincian Biaya (USD)</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Transport</label>
-                            <select name="jenis_transport"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">Pilih Jenis</option>
-                                <option value="luar kota">Luar Kota</option>
-                                <option value="taxi">Taxi</option>
-                                <option value="dalam kota">Dalam Kota</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Biaya Transport (USD)</label>
-                            <input type="number" name="biaya_transport" id="biaya_transport" value="{{ old('biaya_transport', 0) }}" min="0" step="0.01"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Biaya Hotel (USD)</label>
-                            <input type="number" name="biaya_hotel" id="biaya_hotel" value="{{ old('biaya_hotel', 0) }}" min="0" step="0.01"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                    </div>
-
-                    <!-- Ringkasan Biaya -->
-                    <div class="mt-4 bg-gray-50 p-4 rounded-lg">
-                        <div class="space-y-2">
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Uang Harian (<span id="uangHarianLabel">0</span> hari x $<span id="rateLabel">0</span>)</span>
-                                <span class="font-medium">$<span id="totalUangHarian">0</span></span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Biaya Transport</span>
-                                <span class="font-medium">$<span id="displayTransport">0</span></span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Biaya Hotel</span>
-                                <span class="font-medium">$<span id="displayHotel">0</span></span>
-                            </div>
-                            <div class="flex justify-between border-t pt-2 mt-2">
-                                <span class="font-semibold text-gray-800">Total Biaya</span>
-                                <span class="font-bold text-green-600">$<span id="totalBiaya">0</span></span>
-                            </div>
-                            <div class="text-sm text-gray-500 italic">
-                                Terbilang: <span id="terbilang">-</span> Dollar
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div style="margin-bottom:10px;">
+                <label>Nama Lengkap</label><br>
+                <input type="text" name="nama" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
             </div>
 
-            <button type="submit" class="w-full mt-6 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition font-medium">
-                Generate Surat PDF
-            </button>
-        </form>
-    </div>
+            <div style="margin-bottom:10px;">
+                <label>NIP</label><br>
+                <input type="text" name="nip" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+            </div>
+
+            <div style="margin-bottom:10px;">
+                <label>Pangkat</label><br>
+                <input type="text" name="pangkat" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+            </div>
+
+            <div style="margin-bottom:10px;">
+                <label>Golongan (Contoh: IV/a, III/b, dll)</label><br>
+                <input type="text" name="golongan" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+            </div>
+
+            <div style="margin-bottom:10px;">
+                <label>Jabatan</label><br>
+                <input type="text" name="jabatan" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+            </div>
+
+            <div style="margin-bottom:10px;">
+                <label>Eselon</label><br>
+                <select name="eselon" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                    <option value="pejabat_negara">🏛️ Pejabat Negara/Wakil Menteri (Rp250.000/hari)</option>
+                    <option value="eselon_i">⭐ Eselon I (Rp200.000/hari)</option>
+                    <option value="eselon_ii">⭐⭐ Eselon II (Rp150.000/hari)</option>
+                    <option value="eselon_iii">⭐⭐⭐ Eselon III ke bawah (Rp0/hari)</option>
+                </select>
+                <small style="color:#666;">*Mempengaruhi uang representasi</small>
+            </div>
+        </fieldset>
+
+        <!-- DATA PERJALANAN -->
+        <fieldset style="border:1px solid #ddd; padding:15px; margin-bottom:20px; border-radius:5px;">
+            <legend style="font-weight:bold;">✈️ Data Perjalanan Luar Negeri</legend>
+
+            <div style="margin-bottom:10px;">
+                <label>Nomor Surat (Opsional)</label><br>
+                <input type="text" name="nomor_surat" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+            </div>
+
+            <div style="margin-bottom:10px;">
+                <label>Maksud Perjalanan</label><br>
+                <textarea name="maksud_perjalanan" rows="3" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;"></textarea>
+            </div>
+
+            <div style="margin-bottom:10px;">
+                <label>Jenis Angkutan</label><br>
+                <select name="jenis_angkutan" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                    <option value="darat">🚗 Darat</option>
+                    <option value="udara">✈️ Udara</option>
+                    <option value="laut">🚢 Laut</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom:10px;">
+                <label>Tempat Keberangkatan (Kota Asal)</label><br>
+                <input type="text" name="tempat_keberangkatan" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+            </div>
+
+            <div style="margin-bottom:10px;">
+                <label>🌍 Negara Tujuan</label><br>
+                <select name="tujuan" id="tujuan" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                    <option value="">Pilih Negara Tujuan</option>
+                    @foreach($negaraOptions as $negara)
+                        <option value="{{ $negara }}">{{ $negara }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div style="margin-bottom:10px;">
+                <label>🎖️ Golongan Uang Harian Luar Negeri</label><br>
+                <select name="golongan_luar_negeri" id="golongan" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                    <option value="A">Golongan A (Tertinggi) - Pejabat Negara/Eselon I</option>
+                    <option value="B">Golongan B - Eselon II</option>
+                    <option value="C">Golongan C - Eselon III</option>
+                    <option value="D">Golongan D (Terendah) - Eselon IV/Staf</option>
+                </select>
+                <small style="color:#666;">*Sesuai dengan golongan pejabat dan negara tujuan</small>
+            </div>
+
+            <div style="margin-bottom:10px;">
+                <label>📅 Tanggal Keberangkatan</label><br>
+                <input type="date" name="tanggal_keberangkatan" id="tanggal_berangkat" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+            </div>
+
+            <div style="margin-bottom:10px;">
+                <label>📅 Tanggal Kembali</label><br>
+                <input type="date" name="tanggal_kembali" id="tanggal_kembali" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+            </div>
+
+            <div style="margin-bottom:10px;">
+                <label>📊 Lama Hari (Otomatis)</label><br>
+                <input type="number" name="lama_hari" id="lama_hari" readonly style="width:100%; padding:8px; background:#f0f0f0; border:1px solid #ccc; border-radius:4px;">
+            </div>
+        </fieldset>
+
+        <!-- BIAYA LUAR NEGERI -->
+        <fieldset style="border:1px solid #ddd; padding:15px; margin-bottom:20px; border-radius:5px;">
+            <legend style="font-weight:bold;">💰 Biaya Perjalanan (USD - Dolar Amerika)</legend>
+
+            <div style="margin-bottom:10px;">
+                <label>✈️ Biaya Transport Berangkat (Tiket Pesawat)</label><br>
+                <input type="number" name="biaya_transport_berangkat" value="0" step="100" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                <small>Dalam USD (Dolar Amerika)</small>
+            </div>
+
+            <div style="margin-bottom:10px;">
+                <label>✈️ Biaya Transport Pulang (Tiket Pesawat)</label><br>
+                <input type="number" name="biaya_transport_pulang" value="0" step="100" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                <small>Dalam USD (Dolar Amerika)</small>
+            </div>
+
+            <div style="margin-bottom:10px;">
+                <label>🏨 Biaya Hotel (Penginapan per malam)</label><br>
+                <input type="number" name="biaya_hotel" value="0" step="50" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                <small>Dalam USD (Dolar Amerika)</small>
+            </div>
+        </fieldset>
+
+        <!-- RINGKASAN -->
+        <div style="background:#e8f4f8; padding:15px; border-radius:5px; margin-bottom:20px;">
+            <h4>📊 Ringkasan Otomatis:</h4>
+            <p>💰 <strong>Uang Harian per hari:</strong> <span id="uang_harian_per_hari">-</span> USD</p>
+            <p>🎖️ <strong>Uang Representasi per hari:</strong> <span id="uang_representasi_per_hari">-</span> IDR</p>
+            <p>💵 <strong>Total Uang Harian ({{ $trip->lama_hari ?? '?' }} hari):</strong> <span id="total_uang_harian">-</span> USD</p>
+            <p>📊 <strong>Total Perkiraan Biaya Keseluruhan:</strong> <span id="total_estimasi">-</span> USD</p>
+        </div>
+
+        <button type="submit" style="background:#28a745; color:#fff; padding:12px 24px; border:none; border-radius:5px; cursor:pointer; font-size:16px; font-weight:bold;">
+            💾 Simpan & Generate PDF
+        </button>
+    </form>
 </div>
 
 <script>
-// Hitung lama hari
-function hitungLamaHari() {
-    const tglKeberangkatan = document.getElementById('tanggal_keberangkatan').value;
-    const tglKembali = document.getElementById('tanggal_kembali').value;
+    // Hitung lama hari otomatis
+    const tglBerangkat = document.getElementById('tanggal_berangkat');
+    const tglKembali = document.getElementById('tanggal_kembali');
+    const lamaHari = document.getElementById('lama_hari');
 
-    if (tglKeberangkatan && tglKembali) {
-        const start = new Date(tglKeberangkatan);
-        const end = new Date(tglKembali);
-        const diffTime = Math.abs(end - start);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-        document.getElementById('lama_hari').value = diffDays;
-        hitungBiaya();
-    }
-}
-
-// Format angka
-function formatAngka(angka) {
-    return new Intl.NumberFormat('id-ID').format(angka);
-}
-
-// Terbilang function
-function terbilang(angka) {
-    const baca = ['', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan', 'Sepuluh', 'Sebelas'];
-    let terbilang = '';
-
-    if (angka < 12) {
-        terbilang = ' ' + baca[angka];
-    } else if (angka < 20) {
-        terbilang = terbilang(angka - 10) + ' Belas';
-    } else if (angka < 100) {
-        terbilang = terbilang(Math.floor(angka / 10)) + ' Puluh' + terbilang(angka % 10);
-    } else if (angka < 200) {
-        terbilang = ' Seratus' + terbilang(angka - 100);
-    } else if (angka < 1000) {
-        terbilang = terbilang(Math.floor(angka / 100)) + ' Ratus' + terbilang(angka % 100);
-    } else if (angka < 2000) {
-        terbilang = ' Seribu' + terbilang(angka - 1000);
-    } else if (angka < 1000000) {
-        terbilang = terbilang(Math.floor(angka / 1000)) + ' Ribu' + terbilang(angka % 1000);
-    } else if (angka < 1000000000) {
-        terbilang = terbilang(Math.floor(angka / 1000000)) + ' Juta' + terbilang(angka % 1000000);
-    } else if (angka < 1000000000000) {
-        terbilang = terbilang(Math.floor(angka / 1000000000)) + ' Milyar' + terbilang(angka % 1000000000);
+    function hitungLamaHari() {
+        if (tglBerangkat.value && tglKembali.value) {
+            const start = new Date(tglBerangkat.value);
+            const end = new Date(tglKembali.value);
+            const diffTime = Math.abs(end - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            lamaHari.value = diffDays;
+            hitungTotal();
+        }
     }
 
-    return terbilang;
-}
+    tglBerangkat.addEventListener('change', hitungLamaHari);
+    tglKembali.addEventListener('change', hitungLamaHari);
 
-// Hitung biaya
-function hitungBiaya() {
-    const lamaHari = parseInt(document.getElementById('lama_hari').value) || 0;
-    const tujuan = document.getElementById('tujuan');
-    const selectedOption = tujuan.options[tujuan.selectedIndex];
-    const uangHarianPerHari = parseFloat(selectedOption.getAttribute('data-uang-harian')) || 0;
-    const biayaTransport = parseFloat(document.getElementById('biaya_transport').value) || 0;
-    const biayaHotel = parseFloat(document.getElementById('biaya_hotel').value) || 0;
+    // Data dari config
+    const uangHarianData = @json(config('uang-harian.luar_negeri'));
+    const representasiData = {
+        'pejabat_negara': 250000,
+        'eselon_i': 200000,
+        'eselon_ii': 150000,
+        'eselon_iii': 0
+    };
 
-    const totalUangHarian = lamaHari * uangHarianPerHari;
-    const totalBiaya = totalUangHarian + biayaTransport + biayaHotel;
+    // Elemen DOM
+    const tujuanSelect = document.getElementById('tujuan');
+    const golonganSelect = document.getElementById('golongan');
+    const eselonSelect = document.querySelector('select[name="eselon"]');
+    const uangHarianSpan = document.getElementById('uang_harian_per_hari');
+    const representasiSpan = document.getElementById('uang_representasi_per_hari');
+    const totalUangHarianSpan = document.getElementById('total_uang_harian');
+    const totalEstimasiSpan = document.getElementById('total_estimasi');
 
-    document.getElementById('uangHarianLabel').textContent = lamaHari;
-    document.getElementById('rateLabel').textContent = formatAngka(uangHarianPerHari);
-    document.getElementById('totalUangHarian').textContent = formatAngka(totalUangHarian);
-    document.getElementById('displayTransport').textContent = formatAngka(biayaTransport);
-    document.getElementById('displayHotel').textContent = formatAngka(biayaHotel);
-    document.getElementById('totalBiaya').textContent = formatAngka(totalBiaya);
-    document.getElementById('terbilang').textContent = terbilang(Math.floor(totalBiaya));
-}
+    // Update uang harian
+    function updateUangHarian() {
+        const negara = tujuanSelect.value;
+        const golongan = golonganSelect.value;
+        
+        if (negara && uangHarianData[negara]) {
+            const nilai = uangHarianData[negara];
+            if (typeof nilai === 'object') {
+                const uangHarian = nilai[golongan] || nilai['A'] || 0;
+                uangHarianSpan.innerText = uangHarian.toLocaleString('id-ID');
+            } else {
+                uangHarianSpan.innerText = nilai.toLocaleString('id-ID');
+            }
+        } else {
+            uangHarianSpan.innerText = '-';
+        }
+        hitungTotal();
+    }
 
-// Event listeners
-document.getElementById('tanggal_keberangkatan').addEventListener('change', hitungLamaHari);
-document.getElementById('tanggal_kembali').addEventListener('change', hitungLamaHari);
-document.getElementById('tujuan').addEventListener('change', hitungBiaya);
-document.getElementById('biaya_transport').addEventListener('input', hitungBiaya);
-document.getElementById('biaya_hotel').addEventListener('input', hitungBiaya);
+    // Update representasi
+    function updateRepresentasi() {
+        const eselon = eselonSelect.value;
+        representasiSpan.innerText = (representasiData[eselon] || 0).toLocaleString('id-ID');
+        hitungTotal();
+    }
+
+    // Hitung total
+    function hitungTotal() {
+        const negara = tujuanSelect.value;
+        const golongan = golonganSelect.value;
+        const hari = parseInt(lamaHari.value) || 0;
+        
+        let uangHarian = 0;
+        if (negara && uangHarianData[negara]) {
+            const nilai = uangHarianData[negara];
+            if (typeof nilai === 'object') {
+                uangHarian = nilai[golongan] || nilai['A'] || 0;
+            } else {
+                uangHarian = nilai;
+            }
+        }
+        
+        const totalUH = uangHarian * hari;
+        totalUangHarianSpan.innerText = totalUH.toLocaleString('id-ID');
+        
+        // Estimasi total (belum termasuk transport & hotel karena input manual)
+        totalEstimasiSpan.innerText = totalUH.toLocaleString('id-ID') + ' + (transport + hotel)';
+    }
+
+    tujuanSelect.addEventListener('change', updateUangHarian);
+    golonganSelect.addEventListener('change', updateUangHarian);
+    eselonSelect.addEventListener('change', updateRepresentasi);
 </script>
 @endsection
