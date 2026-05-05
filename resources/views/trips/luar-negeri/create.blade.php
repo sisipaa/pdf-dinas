@@ -15,39 +15,42 @@
             <legend style="font-weight:bold;">📋 Data Pegawai</legend>
 
             <div style="margin-bottom:10px;">
-                <label>Nama Lengkap</label><br>
+                <label>Nama Lengkap <span style="color:red;">*</span></label><br>
                 <input type="text" name="nama" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
             </div>
 
             <div style="margin-bottom:10px;">
-                <label>NIP</label><br>
+                <label>NIP <span style="color:red;">*</span></label><br>
                 <input type="text" name="nip" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
             </div>
 
             <div style="margin-bottom:10px;">
-                <label>Pangkat</label><br>
-                <input type="text" name="pangkat" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                <label>Pangkat (Opsional)</label><br>
+                <input type="text" name="pangkat" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                <small style="color:#666;">*Tidak wajib diisi</small>
             </div>
 
             <div style="margin-bottom:10px;">
-                <label>Golongan (Contoh: IV/a, III/b, dll)</label><br>
-                <input type="text" name="golongan" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                <label>Golongan (Opsional - Contoh: IV/a, III/b)</label><br>
+                <input type="text" name="golongan" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                <small style="color:#666;">*Tidak wajib diisi</small>
             </div>
 
             <div style="margin-bottom:10px;">
-                <label>Jabatan</label><br>
+                <label>Jabatan <span style="color:red;">*</span></label><br>
                 <input type="text" name="jabatan" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
             </div>
 
+            <!-- Eselon - TIDAK WAJIB -->
             <div style="margin-bottom:10px;">
-                <label>Eselon</label><br>
-                <select name="eselon" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
-                    <option value="pejabat_negara">🏛️ Pejabat Negara/Wakil Menteri (Rp250.000/hari)</option>
-                    <option value="eselon_i">⭐ Eselon I (Rp200.000/hari)</option>
-                    <option value="eselon_ii">⭐⭐ Eselon II (Rp150.000/hari)</option>
-                    <option value="eselon_iii">⭐⭐⭐ Eselon III ke bawah (Rp0/hari)</option>
+                <label>Eselon (Opsional - Kosongkan jika pegawai biasa)</label><br>
+                <select name="eselon" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
+                    <option value="">📌 Pilih Eselon (Kosongkan jika pegawai biasa)</option>
+                    @foreach($eselonOptions as $value => $label)
+                        <option value="{{ $value }}">{{ $label }}</option>
+                    @endforeach
                 </select>
-                <small style="color:#666;">*Mempengaruhi uang representasi</small>
+                <small style="color:#666;">*Hanya diisi jika pejabat/eselon. Pegawai biasa tidak mendapat uang representasi.</small>
             </div>
         </fieldset>
 
@@ -61,12 +64,12 @@
             </div>
 
             <div style="margin-bottom:10px;">
-                <label>Maksud Perjalanan</label><br>
+                <label>Maksud Perjalanan <span style="color:red;">*</span></label><br>
                 <textarea name="maksud_perjalanan" rows="3" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;"></textarea>
             </div>
 
             <div style="margin-bottom:10px;">
-                <label>Jenis Angkutan</label><br>
+                <label>Jenis Angkutan <span style="color:red;">*</span></label><br>
                 <select name="jenis_angkutan" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
                     <option value="darat">🚗 Darat</option>
                     <option value="udara">✈️ Udara</option>
@@ -75,12 +78,12 @@
             </div>
 
             <div style="margin-bottom:10px;">
-                <label>Tempat Keberangkatan (Kota Asal)</label><br>
+                <label>Tempat Keberangkatan (Kota Asal) <span style="color:red;">*</span></label><br>
                 <input type="text" name="tempat_keberangkatan" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
             </div>
 
             <div style="margin-bottom:10px;">
-                <label>🌍 Negara Tujuan</label><br>
+                <label>🌍 Negara Tujuan <span style="color:red;">*</span></label><br>
                 <select name="tujuan" id="tujuan" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
                     <option value="">Pilih Negara Tujuan</option>
                     @foreach($negaraOptions as $negara)
@@ -90,7 +93,7 @@
             </div>
 
             <div style="margin-bottom:10px;">
-                <label>🎖️ Golongan Uang Harian Luar Negeri</label><br>
+                <label>🎖️ Golongan Uang Harian Luar Negeri <span style="color:red;">*</span></label><br>
                 <select name="golongan_luar_negeri" id="golongan" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
                     <option value="A">Golongan A (Tertinggi) - Pejabat Negara/Eselon I</option>
                     <option value="B">Golongan B - Eselon II</option>
@@ -101,12 +104,12 @@
             </div>
 
             <div style="margin-bottom:10px;">
-                <label>📅 Tanggal Keberangkatan</label><br>
+                <label>📅 Tanggal Keberangkatan <span style="color:red;">*</span></label><br>
                 <input type="date" name="tanggal_keberangkatan" id="tanggal_berangkat" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
             </div>
 
             <div style="margin-bottom:10px;">
-                <label>📅 Tanggal Kembali</label><br>
+                <label>📅 Tanggal Kembali <span style="color:red;">*</span></label><br>
                 <input type="date" name="tanggal_kembali" id="tanggal_kembali" required style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
             </div>
 
@@ -121,19 +124,19 @@
             <legend style="font-weight:bold;">💰 Biaya Perjalanan (USD - Dolar Amerika)</legend>
 
             <div style="margin-bottom:10px;">
-                <label>✈️ Biaya Transport Berangkat (Tiket Pesawat)</label><br>
+                <label>✈️ Biaya Transport Berangkat (Tiket Pesawat) - USD</label><br>
                 <input type="number" name="biaya_transport_berangkat" value="0" step="100" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
                 <small>Dalam USD (Dolar Amerika)</small>
             </div>
 
             <div style="margin-bottom:10px;">
-                <label>✈️ Biaya Transport Pulang (Tiket Pesawat)</label><br>
+                <label>✈️ Biaya Transport Pulang (Tiket Pesawat) - USD</label><br>
                 <input type="number" name="biaya_transport_pulang" value="0" step="100" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
                 <small>Dalam USD (Dolar Amerika)</small>
             </div>
 
             <div style="margin-bottom:10px;">
-                <label>🏨 Biaya Hotel (Penginapan per malam)</label><br>
+                <label>🏨 Biaya Hotel (Penginapan per malam) - USD</label><br>
                 <input type="number" name="biaya_hotel" value="0" step="50" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;">
                 <small>Dalam USD (Dolar Amerika)</small>
             </div>
@@ -144,7 +147,7 @@
             <h4>📊 Ringkasan Otomatis:</h4>
             <p>💰 <strong>Uang Harian per hari:</strong> <span id="uang_harian_per_hari">-</span> USD</p>
             <p>🎖️ <strong>Uang Representasi per hari:</strong> <span id="uang_representasi_per_hari">-</span> IDR</p>
-            <p>💵 <strong>Total Uang Harian ({{ $trip->lama_hari ?? '?' }} hari):</strong> <span id="total_uang_harian">-</span> USD</p>
+            <p>💵 <strong>Total Uang Harian:</strong> <span id="total_uang_harian">-</span> USD</p>
             <p>📊 <strong>Total Perkiraan Biaya Keseluruhan:</strong> <span id="total_estimasi">-</span> USD</p>
         </div>
 
@@ -168,6 +171,8 @@
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
             lamaHari.value = diffDays;
             hitungTotal();
+        } else {
+            lamaHari.value = '';
         }
     }
 
@@ -176,11 +181,13 @@
 
     // Data dari config
     const uangHarianData = @json(config('uang-harian.luar_negeri'));
+    
+    // Representasi berdasarkan eselon (dalam IDR)
     const representasiData = {
         'pejabat_negara': 250000,
         'eselon_i': 200000,
         'eselon_ii': 150000,
-        'eselon_iii': 0
+        'pegawai_biasa': 0
     };
 
     // Elemen DOM
@@ -192,7 +199,7 @@
     const totalUangHarianSpan = document.getElementById('total_uang_harian');
     const totalEstimasiSpan = document.getElementById('total_estimasi');
 
-    // Update uang harian
+    // Update uang harian berdasarkan negara + golongan
     function updateUangHarian() {
         const negara = tujuanSelect.value;
         const golongan = golonganSelect.value;
@@ -211,14 +218,23 @@
         hitungTotal();
     }
 
-    // Update representasi
+    // Update representasi berdasarkan eselon (dalam IDR)
     function updateRepresentasi() {
         const eselon = eselonSelect.value;
-        representasiSpan.innerText = (representasiData[eselon] || 0).toLocaleString('id-ID');
+        let nilai = 0;
+        
+        if (eselon && representasiData[eselon] !== undefined) {
+            nilai = representasiData[eselon];
+        } else {
+            // Jika eselon kosong atau tidak dikenal, anggap pegawai biasa
+            nilai = 0;
+        }
+        
+        representasiSpan.innerText = nilai.toLocaleString('id-ID');
         hitungTotal();
     }
 
-    // Hitung total
+    // Hitung total uang harian dan estimasi
     function hitungTotal() {
         const negara = tujuanSelect.value;
         const golongan = golonganSelect.value;

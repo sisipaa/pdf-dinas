@@ -314,6 +314,8 @@ return [
         'Pejabat Negara/Wakil Menteri' => ['luar_kota' => 250000, 'dalam_kota' => 125000],
         'Eselon I' => ['luar_kota' => 200000, 'dalam_kota' => 100000],
         'Eselon II' => ['luar_kota' => 150000, 'dalam_kota' => 75000],
+        'eselon_iii' => ['luar_kota' => 0, 'dalam_kota' => 0],
+        'pegawai_biasa' => ['luar_kota' => 0, 'dalam_kota' => 0],
     ],
 
     /*

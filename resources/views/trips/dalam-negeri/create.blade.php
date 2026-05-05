@@ -24,13 +24,13 @@
             </div>
 
             <div style="margin-bottom:10px;">
-                <label>Pangkat</label><br>
-                <input type="text" name="pangkat" required style="width:100%; padding:8px;">
+                <label>Pangkat (Opsional)</label><br>
+                <input type="text" name="pangkat" style="width:100%; padding:8px;">
             </div>
 
             <div style="margin-bottom:10px;">
-                <label>Golongan (Contoh: IV/a, III/b, dll)</label><br>
-                <input type="text" name="golongan" required style="width:100%; padding:8px;">
+                <label>Golongan (Opsional - Contoh: IV/a, III/b)</label><br>
+                <input type="text" name="golongan" style="width:100%; padding:8px;">
             </div>
 
             <div style="margin-bottom:10px;">
@@ -39,14 +39,14 @@
             </div>
 
             <div style="margin-bottom:10px;">
-                <label>Eselon</label><br>
-                <select name="eselon" required style="width:100%; padding:8px;">
-                    <option value="pejabat_negara">Pejabat Negara/Wakil Menteri</option>
-                    <option value="eselon_i">Eselon I</option>
-                    <option value="eselon_ii">Eselon II</option>
-                    <option value="eselon_iii">Eselon III ke bawah</option>
+                <label>Eselon (Opsional - Kosongkan jika pegawai biasa)</label><br>
+                <select name="eselon" style="width:100%; padding:8px;">
+                    <option value="">Pilih Eselon (Kosongkan jika pegawai biasa)</option>
+                    @foreach($eselonOptions as $value => $label)
+                        <option value="{{ $value }}">{{ $label }}</option>
+                    @endforeach
                 </select>
-                <small style="color:#666;">*Mempengaruhi uang representasi (Eselon I: Rp200.000/hari, Eselon II: Rp150.000/hari)</small>
+                <small style="color:#666;">*Hanya diisi jika pejabat/eselon. Pegawai biasa tidak mendapat uang representasi.</small>
             </div>
         </fieldset>
 
@@ -224,7 +224,8 @@
         'pejabat_negara': 250000,
         'eselon_i': 200000,
         'eselon_ii': 150000,
-        'eselon_iii': 0
+        'eselon_iii': 0,
+        'pegawai_biasa': 0  // <-- TAMBAHKAN INI
     };
 
     eselonSelect.addEventListener('change', function() {

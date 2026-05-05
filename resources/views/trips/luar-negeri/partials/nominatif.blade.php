@@ -37,6 +37,11 @@
             <td class="separator">:</td>
             <td>{{ $trip->golongan_luar_negeri ?? '-' }} (A/B/C/D)</td>
         </tr>
+        <tr>
+            <td class="label">Eselon</td>
+            <td class="separator">:</td>
+            <td>{{ $trip->eselon && $trip->eselon !== 'pegawai_biasa' ? ucwords(str_replace('_', ' ', $trip->eselon)) : 'Pegawai Biasa' }}</td>
+        </tr>
     </table>
 </div>
 
@@ -47,12 +52,12 @@
                 <th style="width:5%">No</th>
                 <th style="width:18%">Nama</th>
                 <th style="width:12%">NIP</th>
-                <th style="width:12%">Jabatan</th>
-                <th style="width:8%">Golongan</th>
-                <th style="width:12%">Uang Harian</th>
+                <th style="width:14%">Jabatan</th>
+                <th style="width:8%">Gol. LN</th>
+                <th style="width:12%">Uang Harian (USD)</th>
                 <th style="width:10%">Transport (USD)</th>
                 <th style="width:10%">Hotel (USD)</th>
-                <th style="width:13%">Total (USD)</th>
+                <th style="width:11%">Total (USD)</th>
             </tr>
         </thead>
         <tbody>
@@ -112,7 +117,7 @@
 <!-- Tanda Tangan -->
 <div class="tanda-tangan" style="margin-top:40px;">
     <table style="width:100%;">
-        </tr>
+        <tr>
             <td width="60%"></td>
             <td width="40%" class="center">
                 Jakarta, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}<br>
