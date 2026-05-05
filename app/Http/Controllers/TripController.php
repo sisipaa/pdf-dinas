@@ -253,29 +253,15 @@ class TripController extends Controller
 
         try {
             $html = view('trips.dalam-negeri.pdf', compact('trip'))->render();
-            
-            $filename = 'surat_dinas_dalam_negeri_' . $trip->id . '_' . time() . '.pdf';
-            $pdfPath = storage_path('app/public/pdfs/' . $filename);
-
-            $dir = dirname($pdfPath);
-            if (!is_dir($dir)) {
-                mkdir($dir, 0755, true);
-            }
-
-            // Generate PDF dengan DomPDF
+        
+            // Generate PDF langsung ke browser (tanpa simpan file)
             $pdf = PDF::loadHTML($html);
             $pdf->setPaper('A4', 'portrait');
-            $pdf->save($pdfPath);
-
-            $trip->update(['file_pdf' => 'pdfs/' . $filename]);
-
-            return response()->file($pdfPath, [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'inline; filename="' . $filename . '"',
-            ]);
+        
+            return $pdf->download('surat_dinas_dalam_negeri_' . $trip->id . '.pdf');
+        
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('PDF Generation Error (Dalam Negeri): ' . $e->getMessage());
-            return back()->with('error', 'Gagal generate PDF: ' . $e->getMessage());
+            return back()->with('error', 'PDF Error: ' . $e->getMessage() . ' - Line: ' . $e->getLine());
         }
     }
 
@@ -285,28 +271,14 @@ class TripController extends Controller
 
         try {
             $html = view('trips.luar-negeri.pdf', compact('trip'))->render();
-            
-            $filename = 'surat_dinas_luar_negeri_' . $trip->id . '_' . time() . '.pdf';
-            $pdfPath = storage_path('app/public/pdfs/' . $filename);
-
-            $dir = dirname($pdfPath);
-            if (!is_dir($dir)) {
-                mkdir($dir, 0755, true);
-            }
-
+        
             $pdf = PDF::loadHTML($html);
             $pdf->setPaper('A4', 'portrait');
-            $pdf->save($pdfPath);
-
-            $trip->update(['file_pdf' => 'pdfs/' . $filename]);
-
-            return response()->file($pdfPath, [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'inline; filename="' . $filename . '"',
-            ]);
+        
+            return $pdf->download('surat_dinas_luar_negeri_' . $trip->id . '.pdf');
+        
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('PDF Generation Error (Luar Negeri): ' . $e->getMessage());
-            return back()->with('error', 'Gagal generate PDF: ' . $e->getMessage());
+            return back()->with('error', 'PDF Error: ' . $e->getMessage() . ' - Line: ' . $e->getLine());
         }
     }
 
