@@ -21,10 +21,9 @@
         "phpunit/phpunit": "^11.5.50"
     },
     "autoload": {
-    "files": [
-        "app/Helpers/helpers.php"
-    ]
-}
+        "files": [
+            "app/Helpers/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

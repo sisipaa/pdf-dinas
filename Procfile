@@ -1,1 +1,1 @@
-web: vendor/bin/heroku-php-apache2 public/
+web: composer install --no-dev --optimize-autoloader --no-interaction && php artisan migrate --force && php artisan serve --host 0.0.0.0 --port $PORT
