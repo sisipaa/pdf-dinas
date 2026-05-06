@@ -191,28 +191,34 @@
     tglKembali.addEventListener('change', hitungLamaHari);
 
     // Set fixed biaya
-    document.getElementById('biaya_taxi_jakarta').value = {{ config('uang-harian.taxi_jakarta') }};
-    document.getElementById('biaya_dalam_kota').value = {{ config('uang-harian.dalam_kota_jakarta') }};
+    document.getElementById('biaya_taxi_jakarta').value = {{ config('uang-harian.taxi_jakarta', 274000) }};
+    document.getElementById('biaya_dalam_kota').value = {{ config('uang-harian.transport_dalam_kota_jakarta', 170000) }};
+
+    // Data dari PHP
+    const taxiTujuanData = @json(config('uang-harian.taxi_tujuan', []));
+    const uangHarianData = @json(config('uang-harian.dalam_negeri', []));
+    const transportSekitarData = @json(config('uang-harian.transportasi_sekitar_jakarta', []));
 
     // Ambil biaya taxi tujuan berdasarkan provinsi
     const tujuanSelect = document.getElementById('tujuan');
     const biayaTaxiTujuan = document.getElementById('biaya_taxi_tujuan');
     const uangHarianSpan = document.getElementById('uang_harian_per_hari');
     const representasiSpan = document.getElementById('uang_representasi_per_hari');
-
-    const taxiTujuanData = @json(config('uang-harian.transportasi_terminal_tujuan'));
-    const uangHarianData = @json(config('uang-harian.dalam_negeri'));
+    const transportSekitarSelect = document.getElementById('transport_sekitar');
 
     tujuanSelect.addEventListener('change', function() {
         const provinsi = this.value;
+        
+        // Update taxi tujuan
         if (taxiTujuanData[provinsi]) {
             biayaTaxiTujuan.value = taxiTujuanData[provinsi];
         } else {
-            biayaTaxiTujuan.value = {{ config('uang-harian.default_transportasi_terminal') }};
+            biayaTaxiTujuan.value = 0;
         }
 
-        if (uangHarianData[provinsi]) {
-            uangHarianSpan.innerText = new Intl.NumberFormat('id-ID').format(uangHarianData[provinsi]);
+        // Update uang harian display
+        if (uangHarianData[provinsi] && uangHarianData[provinsi].luar_kota) {
+            uangHarianSpan.innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(uangHarianData[provinsi].luar_kota);
         } else {
             uangHarianSpan.innerText = '-';
         }
@@ -224,13 +230,21 @@
         'pejabat_negara': 250000,
         'eselon_i': 200000,
         'eselon_ii': 150000,
-        'eselon_iii': 0,
-        'pegawai_biasa': 0  // <-- TAMBAHKAN INI
+        'pegawai_biasa': 0
     };
 
     eselonSelect.addEventListener('change', function() {
         const val = representasiData[this.value] || 0;
-        representasiSpan.innerText = new Intl.NumberFormat('id-ID').format(val);
+        representasiSpan.innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(val);
+    });
+
+    // Update biaya transport sekitar jakarta
+    transportSekitarSelect.addEventListener('change', function() {
+        const selectedKab = this.value;
+        if (selectedKab && selectedKab !== '0' && transportSekitarData[selectedKab]) {
+            // Set nilai ke hidden input atau display
+            console.log('Biaya transport ke ' + selectedKab + ': Rp ' + new Intl.NumberFormat('id-ID').format(transportSekitarData[selectedKab]));
+        }
     });
 </script>
 @endsection

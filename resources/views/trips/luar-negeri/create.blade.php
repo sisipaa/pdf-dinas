@@ -180,7 +180,7 @@
     tglKembali.addEventListener('change', hitungLamaHari);
 
     // Data dari config
-    const uangHarianData = @json(config('uang-harian.luar_negeri'));
+    const uangHarianData = @json(config('uang-harian.luar_negeri', []));
     
     // Representasi berdasarkan eselon (dalam IDR)
     const representasiData = {
@@ -208,9 +208,9 @@
             const nilai = uangHarianData[negara];
             if (typeof nilai === 'object') {
                 const uangHarian = nilai[golongan] || nilai['A'] || 0;
-                uangHarianSpan.innerText = uangHarian.toLocaleString('id-ID');
+                uangHarianSpan.innerText = '$ ' + uangHarian.toLocaleString('en-US');
             } else {
-                uangHarianSpan.innerText = nilai.toLocaleString('id-ID');
+                uangHarianSpan.innerText = '$ ' + nilai.toLocaleString('en-US');
             }
         } else {
             uangHarianSpan.innerText = '-';
@@ -225,12 +225,9 @@
         
         if (eselon && representasiData[eselon] !== undefined) {
             nilai = representasiData[eselon];
-        } else {
-            // Jika eselon kosong atau tidak dikenal, anggap pegawai biasa
-            nilai = 0;
         }
         
-        representasiSpan.innerText = nilai.toLocaleString('id-ID');
+        representasiSpan.innerText = 'Rp ' + nilai.toLocaleString('id-ID');
         hitungTotal();
     }
 
@@ -251,10 +248,8 @@
         }
         
         const totalUH = uangHarian * hari;
-        totalUangHarianSpan.innerText = totalUH.toLocaleString('id-ID');
-        
-        // Estimasi total (belum termasuk transport & hotel karena input manual)
-        totalEstimasiSpan.innerText = totalUH.toLocaleString('id-ID') + ' + (transport + hotel)';
+        totalUangHarianSpan.innerText = '$ ' + totalUH.toLocaleString('en-US');
+        totalEstimasiSpan.innerText = '$ ' + totalUH.toLocaleString('en-US') + ' + (transport + hotel)';
     }
 
     tujuanSelect.addEventListener('change', updateUangHarian);

@@ -291,16 +291,16 @@ return [
     |--------------------------------------------------------------------------
     | Biaya transportasi dari DKI Jakarta ke Kabupaten/Kota sekitar
     */
-    'transport_antar_kabupaten' => [
-        'Kota Bekasi' => 256000,
-        'Kab. Bekasi' => 256000,
-        'Kab. Bogor' => 270000,
-        'Kota Bogor' => 270000,
-        'Kota Depok' => 248000,
-        'Kota Tangerang' => 258000,
-        'Kota Tangerang Selatan' => 258000,
-        'Kab. Tangerang' => 279000,
-        'Kepulauan Seribu' => 386000,
+    'transportasi_sekitar_jakarta' => [
+    'Kota Bekasi' => 256000,
+    'Kab. Bekasi' => 256000,
+    'Kab. Bogor' => 270000,
+    'Kota Bogor' => 270000,
+    'Kota Depok' => 248000,
+    'Kota Tangerang' => 258000,
+    'Kota Tangerang Selatan' => 258000,
+    'Kab. Tangerang' => 279000,
+    'Kepulauan Seribu' => 386000,
     ],
 
     /*
@@ -311,11 +311,11 @@ return [
     | Berdasarkan PDF: LUAR KOTA dan DALAM KOTA (>8 JAM)
     */
     'uang_representasi' => [
-        'Pejabat Negara/Wakil Menteri' => ['luar_kota' => 250000, 'dalam_kota' => 125000],
-        'Eselon I' => ['luar_kota' => 200000, 'dalam_kota' => 100000],
-        'Eselon II' => ['luar_kota' => 150000, 'dalam_kota' => 75000],
-        'eselon_iii' => ['luar_kota' => 0, 'dalam_kota' => 0],
-        'pegawai_biasa' => ['luar_kota' => 0, 'dalam_kota' => 0],
+    'Pejabat Negara/Wakil Menteri' => ['luar_kota' => 250000, 'dalam_kota' => 125000],
+    'Eselon I' => ['luar_kota' => 200000, 'dalam_kota' => 100000],
+    'Eselon II' => ['luar_kota' => 150000, 'dalam_kota' => 75000],
+    'eselon_iii' => ['luar_kota' => 0, 'dalam_kota' => 0],
+    'pegawai_biasa' => ['luar_kota' => 0, 'dalam_kota' => 0],
     ],
 
     /*
@@ -334,7 +334,10 @@ return [
     |--------------------------------------------------------------------------
     */
     'default_dalam_negeri_luar_kota' => 370000,
+    'default_dalam_kota' => 150000,
+    'default_dalam_kota_jakarta' => 170000,
     'default_luar_negeri' => 300,
+    'default_transportasi_terminal' => 150000,
     'default_golongan_kategori' => 'C',
 
     /*
@@ -431,4 +434,5 @@ return [
         'Sorong' => 'Papua Barat',
         'Manokwari' => 'Papua Barat',
     ],
+
 ];

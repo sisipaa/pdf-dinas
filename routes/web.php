@@ -5,6 +5,15 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TripController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/test-pdf', function() {
+    try {
+        $pdf = Barryvdh\DomPDF\Facade\Pdf::loadHTML('<h1>Test PDF</h1><p>If you see this, DomPDF works!</p>');
+        return $pdf->download('test.pdf');
+    } catch (Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
+
 // Guest routes
 Route::middleware('guest')->group(function () {
     Route::get('/', function () {
@@ -15,6 +24,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
 });
+
 
 // Authenticated routes
 Route::middleware('auth')->group(function () {
