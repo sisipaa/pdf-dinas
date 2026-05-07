@@ -26,6 +26,19 @@ Route::get('/test-spd', function() {
     }
 });
 
+Route::get('/test-full-pdf', function() {
+    $trip = \App\Models\Trip::where('type', 'luar_negeri')->first();
+    if (!$trip) {
+        return 'No luar negeri trip found. Create one first.';
+    }
+    try {
+        $html = view('trips.luar-negeri.pdf', compact('trip'))->render();
+        return 'PDF HTML rendered successfully! Length: ' . strlen($html) . ' chars';
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage() . '<br>File: ' . $e->getFile() . '<br>Line: ' . $e->getLine();
+    }
+});
+
 // Guest routes
 Route::middleware('guest')->group(function () {
     Route::get('/', function () {
