@@ -26,14 +26,19 @@ Route::get('/test-spd', function() {
     }
 });
 
-Route::get('/test-full-pdf', function() {
+Route::get('/test-full-pdf-ln', function() {
     $trip = \App\Models\Trip::where('type', 'luar_negeri')->first();
     if (!$trip) {
         return 'No luar negeri trip found. Create one first.';
     }
     try {
         $html = view('trips.luar-negeri.pdf', compact('trip'))->render();
-        return 'PDF HTML rendered successfully! Length: ' . strlen($html) . ' chars';
+        
+        // Test generate PDF
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML($html);
+        $pdf->setPaper('A4', 'portrait');
+        
+        return $pdf->download('test-luar-negeri.pdf');
     } catch (\Exception $e) {
         return 'Error: ' . $e->getMessage() . '<br>File: ' . $e->getFile() . '<br>Line: ' . $e->getLine();
     }
