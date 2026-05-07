@@ -14,6 +14,18 @@ Route::get('/test-pdf', function() {
     }
 });
 
+Route::get('/test-spd', function() {
+    $trip = \App\Models\Trip::first();
+    if (!$trip) {
+        return 'No trip found. Create one first.';
+    }
+    try {
+        return view('trips.dalam-negeri.partials.spd', compact('trip'))->render();
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage() . '<br>File: ' . $e->getFile() . '<br>Line: ' . $e->getLine();
+    }
+});
+
 // Guest routes
 Route::middleware('guest')->group(function () {
     Route::get('/', function () {

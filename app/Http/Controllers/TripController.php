@@ -256,18 +256,26 @@ class TripController extends Controller
     // ==================== PDF GENERATION ====================
 
     public function generatePdfDalamNegeri($id)
-    {
-        $trip = Trip::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+{
+    $trip = Trip::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
 
-        try {
-            $html = view('trips.dalam-negeri.pdf', compact('trip'))->render();
-            $pdf = PDF::loadHTML($html);
-            $pdf->setPaper('A4', 'portrait');
-            return $pdf->download('surat_dinas_dalam_negeri_' . $trip->id . '.pdf');
-        } catch (\Exception $e) {
-            return back()->with('error', 'PDF Error: ' . $e->getMessage());
-        }
+    try {
+        // Test render view satu per satu untuk cari partial yang error
+        $html = view('trips.dalam-negeri.pdf', compact('trip'))->render();
+        
+        $pdf = PDF::loadHTML($html);
+        $pdf->setPaper('A4', 'portrait');
+        return $pdf->download('surat_dinas_dalam_negeri_' . $trip->id . '.pdf');
+    } catch (\Exception $e) {
+        // Tampilkan error lengkap untuk debugging
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
     }
+}
 
     public function generatePdfLuarNegeri($id)
     {
