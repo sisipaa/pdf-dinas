@@ -79,35 +79,35 @@ class TripController extends Controller
     }
 
     public function storeDalamNegeri(Request $request)
-    {
-        try {
-            $validated = $request->validate([
-                'nomor_surat' => 'nullable|string|max:100',
-                'tanggal_keberangkatan' => 'required|date',
-                'nama' => 'required|string|max:255',
-                'nip' => 'required|string|max:50',
-                'pangkat' => 'nullable|string|max:100',
-                'golongan' => 'nullable|string|max:50',
-                'jabatan' => 'required|string|max:255',
-                'eselon' => 'nullable|string',
-                'jenis_perjalanan' => 'required|in:fullboard,dalam_kota_jakarta,sekitar_jakarta,luar_kota',
-                'maksud_perjalanan' => 'required|string',
-                'jenis_angkutan' => 'nullable|in:darat,udara',
-                'tempat_keberangkatan' => 'nullable|string|max:255',
-                'tujuan' => 'nullable|string',
-                'lama_hari' => 'required|integer|min:1',
-                'tanggal_kembali' => 'required|date|after:tanggal_keberangkatan',
-                'biaya_transport_berangkat' => 'nullable|numeric|min:0',
-                'biaya_transport_pulang' => 'nullable|numeric|min:0',
-                'biaya_taxi_keberangkatan' => 'nullable|numeric|min:0',
-                'biaya_taxi_tujuan' => 'nullable|numeric|min:0',
-                'biaya_transport_sekitar' => 'nullable|numeric|min:0',
-                'biaya_hotel' => 'nullable|numeric|min:0',
-                'uang_harian_manual' => 'nullable|numeric|min:0',
-            ]);
+{
+    try {
+        $validated = $request->validate([
+            'nomor_surat' => 'nullable|string|max:100',
+            'tanggal_keberangkatan' => 'required|date',
+            'nama' => 'required|string|max:255',
+            'nip' => 'required|string|max:50',
+            'pangkat' => 'nullable|string|max:100',
+            'golongan' => 'nullable|string|max:50',
+            'jabatan' => 'required|string|max:255',
+            'eselon' => 'nullable|string',
+            'jenis_perjalanan' => 'required|in:fullboard,dalam_kota_jakarta,sekitar_jakarta,luar_kota',
+            'maksud_perjalanan' => 'required|string',
+            'jenis_angkutan' => 'nullable|in:darat,udara',
+            'tempat_keberangkatan' => 'nullable|string|max:255',
+            'tujuan' => 'nullable|string|max:255',
+            'lama_hari' => 'required|integer|min:1',
+            'tanggal_kembali' => 'required|date',
+            'biaya_transport_berangkat' => 'nullable|numeric|min:0',
+            'biaya_transport_pulang' => 'nullable|numeric|min:0',
+            'biaya_taxi_keberangkatan' => 'nullable|numeric|min:0',
+            'biaya_taxi_tujuan' => 'nullable|numeric|min:0',
+            'biaya_transport_sekitar' => 'nullable|numeric|min:0',
+            'biaya_hotel' => 'nullable|numeric|min:0',
+            'uang_harian_manual' => 'nullable|numeric|min:0',
+        ]);
 
-            $jenisPerjalanan = $validated['jenis_perjalanan'];
-            $lamaHari = $validated['lama_hari'];
+        $jenisPerjalanan = $validated['jenis_perjalanan'];
+        $lamaHari = $validated['lama_hari'];
             
             // Default values
             $uangHarianPerHari = 0;
@@ -123,93 +123,108 @@ class TripController extends Controller
             $jenisAngkutan = $validated['jenis_angkutan'] ?? 'udara';
             
             // Hitung berdasarkan jenis perjalanan
-            switch ($jenisPerjalanan) {
-                case 'fullboard':
-                    $uangHarianPerHari = 130000;
-                    $tujuan = 'Rapat/Pertemuan (Fullboard)';
-                    break;
-                    
-                case 'dalam_kota_jakarta':
-                    $biayaDalamKota = 170000;
-                    $tujuan = 'DKI Jakarta (Dalam Kota)';
-                    // Uang harian Jakarta dalam kota = 210000
-                    $uangHarianPerHari = $validated['uang_harian_manual'] ?? 210000;
-                    break;
-                    
-                case 'sekitar_jakarta':
-                    $biayaDalamKota = 170000;
-                    $tujuan = $validated['tujuan'] ?? 'Sekitar Jakarta';
-                    // Uang harian sesuai provinsi tujuan (default Jawa Barat)
-                    $uangHarianPerHari = $this->getUangHarianDalamNegeri($tujuan, 'luar_kota');
-                    if ($uangHarianPerHari == 370000) {
-                        $uangHarianPerHari = 430000; // Default Jawa Barat
-                    }
-                    break;
-                    
-                case 'luar_kota':
-                    $tujuan = $validated['tujuan'];
-                    $tempatKeberangkatan = $validated['tempat_keberangkatan'];
-                    $jenisAngkutan = $validated['jenis_angkutan'] ?? 'udara';
-                    $uangHarianPerHari = $this->getUangHarianDalamNegeri($tujuan, 'luar_kota');
-                    break;
-            }
-            
-            $totalUangHarian = $uangHarianPerHari * $lamaHari;
-            
-            // Uang Representasi (jika eselon diisi)
-            $uangRepresentasiPerHari = $this->getUangRepresentasi($validated['eselon'] ?? '', 'luar_kota');
-            $totalUangRepresentasi = $uangRepresentasiPerHari * $lamaHari;
-            
-            // Total biaya
-            $totalBiaya = $totalUangHarian + $totalUangRepresentasi 
-                        + $biayaTransportBerangkat + $biayaTransportPulang
-                        + $biayaTaxiKeberangkatan + $biayaTaxiTujuan 
-                        + $biayaDalamKota + $biayaTransportSekitar + $biayaHotel;
-
-            $trip = Trip::create([
-                'user_id' => Auth::id(),
-                'type' => 'dalam_negeri',
-                'nomor_surat' => $validated['nomor_surat'] ?? null,
-                'tanggal_keberangkatan' => $validated['tanggal_keberangkatan'],
-                'nama' => $validated['nama'],
-                'nip' => $validated['nip'],
-                'pangkat' => $validated['pangkat'] ?? null,
-                'golongan' => $validated['golongan'] ?? null,
-                'jabatan' => $validated['jabatan'],
-                'eselon' => $validated['eselon'] ?? 'pegawai_biasa',
-                'maksud_perjalanan' => $validated['maksud_perjalanan'],
-                'jenis_angkutan' => $jenisAngkutan,
-                'tempat_keberangkatan' => $tempatKeberangkatan,
-                'tujuan' => $tujuan,
-                'lama_hari' => $lamaHari,
-                'tanggal_kembali' => $validated['tanggal_kembali'],
-                'uang_harian_per_hari' => $uangHarianPerHari,
-                'total_uang_harian' => $totalUangHarian,
-                'uang_representasi_per_hari' => $uangRepresentasiPerHari,
-                'total_uang_representasi' => $totalUangRepresentasi,
-                'biaya_transport_berangkat' => $biayaTransportBerangkat,
-                'biaya_taxi_jakarta' => 0,
-                'jenis_taxi_jakarta' => 'sekali_jalan',
-                'biaya_transport_pulang' => $biayaTransportPulang,
-                'biaya_taxi_tujuan' => $biayaTaxiTujuan,
-                'biaya_dalam_kota' => $biayaDalamKota,
-                'biaya_transport_sekitar_jakarta' => $biayaTransportSekitar,
-                'biaya_hotel' => $biayaHotel,
-                'total_biaya' => $totalBiaya,
-                'mata_uang' => 'IDR',
-                'status' => 'pending',
-            ]);
-
-            return redirect()->route('trips.dalam-negeri.pdf', $trip->id);
-            
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-            ], 500);
+          
+        
+        switch ($jenisPerjalanan) {
+            case 'fullboard':
+                $tujuan = 'Rapat/Pertemuan (Fullboard)';
+                $uangHarianPerHari = 130000;
+                $jenisAngkutan = 'darat';
+                $tempatKeberangkatan = 'Jakarta';
+                break;
+                
+            case 'dalam_kota_jakarta':
+                $tujuan = 'DKI Jakarta (Dalam Kota)';
+                $uangHarianPerHari = $validated['uang_harian_manual'] ?? 210000;
+                $jenisAngkutan = 'darat';
+                $tempatKeberangkatan = 'Jakarta';
+                break;
+                
+            case 'sekitar_jakarta':
+                if (empty($tujuan)) {
+                    $tujuan = 'Sekitar Jakarta';
+                }
+                $uangHarianPerHari = 430000; // Default Jawa Barat
+                $jenisAngkutan = 'darat';
+                $tempatKeberangkatan = 'Jakarta';
+                break;
+                
+            case 'luar_kota':
+                if (empty($tujuan)) {
+                    $tujuan = 'Luar Kota';
+                }
+                $uangHarianPerHari = $this->getUangHarianDalamNegeri($tujuan, 'luar_kota');
+                $jenisAngkutan = $validated['jenis_angkutan'] ?? 'udara';
+                $tempatKeberangkatan = $validated['tempat_keberangkatan'] ?? 'Jakarta';
+                break;
+                
+            default:
+                $tujuan = 'Tidak ditentukan';
+                $uangHarianPerHari = 370000;
+                $jenisAngkutan = 'darat';
+                $tempatKeberangkatan = 'Jakarta';
         }
+        
+        $totalUangHarian = $uangHarianPerHari * $lamaHari;
+        
+        $uangRepresentasiPerHari = $this->getUangRepresentasi($validated['eselon'] ?? '', 'luar_kota');
+        $totalUangRepresentasi = $uangRepresentasiPerHari * $lamaHari;
+        
+        $biayaTransportBerangkat = $validated['biaya_transport_berangkat'] ?? 0;
+        $biayaTransportPulang = $validated['biaya_transport_pulang'] ?? 0;
+        $biayaTaxiTujuan = $validated['biaya_taxi_tujuan'] ?? 0;
+        $biayaTransportSekitar = $validated['biaya_transport_sekitar'] ?? 0;
+        $biayaHotel = $validated['biaya_hotel'] ?? 0;
+        $biayaDalamKota = ($jenisPerjalanan == 'dalam_kota_jakarta' || $jenisPerjalanan == 'sekitar_jakarta') ? 170000 : 0;
+        
+        $totalBiaya = $totalUangHarian + $totalUangRepresentasi 
+                    + $biayaTransportBerangkat + $biayaTransportPulang
+                    + $biayaTaxiTujuan + $biayaDalamKota + $biayaTransportSekitar + $biayaHotel;
+
+        $trip = Trip::create([
+            'user_id' => Auth::id(),
+            'type' => 'dalam_negeri',
+            'nomor_surat' => $validated['nomor_surat'] ?? null,
+            'tanggal_keberangkatan' => $validated['tanggal_keberangkatan'],
+            'nama' => $validated['nama'],
+            'nip' => $validated['nip'],
+            'pangkat' => $validated['pangkat'] ?? null,
+            'golongan' => $validated['golongan'] ?? null,
+            'jabatan' => $validated['jabatan'],
+            'eselon' => $validated['eselon'] ?? 'pegawai_biasa',
+            'maksud_perjalanan' => $validated['maksud_perjalanan'],
+            'jenis_angkutan' => $jenisAngkutan,
+            'tempat_keberangkatan' => $tempatKeberangkatan,
+            'tujuan' => $tujuan, // PASTI ADA
+            'lama_hari' => $lamaHari,
+            'tanggal_kembali' => $validated['tanggal_kembali'],
+            'uang_harian_per_hari' => $uangHarianPerHari,
+            'total_uang_harian' => $totalUangHarian,
+            'uang_representasi_per_hari' => $uangRepresentasiPerHari,
+            'total_uang_representasi' => $totalUangRepresentasi,
+            'biaya_transport_berangkat' => $biayaTransportBerangkat,
+            'biaya_taxi_jakarta' => 0,
+            'jenis_taxi_jakarta' => 'sekali_jalan',
+            'biaya_transport_pulang' => $biayaTransportPulang,
+            'biaya_taxi_tujuan' => $biayaTaxiTujuan,
+            'biaya_dalam_kota' => $biayaDalamKota,
+            'biaya_transport_sekitar_jakarta' => $biayaTransportSekitar,
+            'biaya_hotel' => $biayaHotel,
+            'total_biaya' => $totalBiaya,
+            'mata_uang' => 'IDR',
+            'status' => 'pending',
+        ]);
+
+        return redirect()->route('trips.dalam-negeri.pdf', $trip->id);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ], 500);
     }
+}
 
     // ==================== LUAR NEGERI ====================
 

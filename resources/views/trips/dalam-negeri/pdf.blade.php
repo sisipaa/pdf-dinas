@@ -50,8 +50,5 @@
 @include('trips.dalam-negeri.partials.nominatif')
 <div class="page-break"></div>  
 
-@include('trips.dalam-negeri.partials.nip')
-
-
 </body>
 </html> 
