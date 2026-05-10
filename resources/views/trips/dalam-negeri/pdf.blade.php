@@ -29,12 +29,6 @@
     .right { 
         text-align: right; 
     }
-    .left {
-        text-align: left;
-    }
-    hr {
-        margin: 10px 0;
-    }
 </style>
 </head>
 <body>
@@ -42,22 +36,22 @@
 @include('trips.dalam-negeri.partials.spd')
 <div class="page-break"></div>
 
-@include('trips.dalam-negeri.partials.perjalanan')
-<div class="page-break"></div>
-
 @include('trips.dalam-negeri.partials.rincian')
+
+@include('trips.dalam-negeri.partials.perjalanan')
 <div class="page-break"></div>
 
 @include('trips.dalam-negeri.partials.kwitansi')
 <div class="page-break"></div>
 
 @include('trips.dalam-negeri.partials.riil')
-<div class="page-break"></div>
+<div class="page-break"></div>  
 
 @include('trips.dalam-negeri.partials.nominatif')
-<div class="page-break"></div>
+<div class="page-break"></div>  
 
 @include('trips.dalam-negeri.partials.nip')
 
+
 </body>
-</html>
+</html> 

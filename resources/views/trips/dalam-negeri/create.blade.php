@@ -189,6 +189,10 @@
         <button type="submit" style="background:#28a745; color:#fff; padding:12px 24px; border:none; border-radius:5px; cursor:pointer; font-size:16px;">
             💾 Simpan & Generate PDF
         </button>
+        
+        <form action="{{ route('trips.dalam-negeri.store') }}" method="POST" id="formDinas" onsubmit="return disableSubmit()">
+
+
     </form>
 </div>
 
@@ -302,6 +306,13 @@ function updateTotal() {
     const rep = parseInt(repText) || 0;
     const total = (uh + rep) * hari;
     document.getElementById('display_total').innerText = 'Rp ' + total.toLocaleString('id-ID') + ' + transport + hotel';
+}
+
+function disableSubmit() {
+    const btn = document.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.innerText = 'Menyimpan...';
+    return true;
 }
 </script>
 @endsection

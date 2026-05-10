@@ -24,8 +24,8 @@ Nomor: {{ $trip->nomor_surat ?? '-' }}
     <tr><td>6.</td><td>Tempat Berangkat</td><td>:</td><td>{{ $trip->tempat_keberangkatan }}</td></tr>
     <tr><td></td><td>Tujuan</td><td>:</td><td>{{ $trip->tujuan }}</td></tr>
     <tr><td>7.</td><td>Lama</td><td>:</td><td>{{ $trip->lama_hari }} hari</td></tr>
-    <tr><td></td><td>Tgl Berangkat</td><td>:</td><td>{{ \Carbon\Carbon::parse($trip->tanggal_keberangkatan)->translatedFormat('d F Y') }}</td></tr>
-    <tr><td></td><td>Tgl Kembali</td><td>:</td><td>{{ \Carbon\Carbon::parse($trip->tanggal_kembali)->translatedFormat('d F Y') }}</td></tr>
+    <tr><td></td><td>Tgl Berangkat</td><td>:</td><td>{{ \Carbon\Carbon::parse($trip->tanggal_keberangkatan)->format('d F Y') }}</td></tr>
+    <tr><td></td><td>Tgl Kembali</td><td>:</td><td>{{ \Carbon\Carbon::parse($trip->tanggal_kembali)->format('d F Y') }}</td></tr>
 </table>
 
 <br><br>
@@ -38,7 +38,7 @@ Nomor: {{ $trip->nomor_surat ?? '-' }}
             (____________________)
         </td>
         <td width="50%" class="right">
-            Jakarta, {{ now()->translatedFormat('d F Y') }}<br>
+            Jakarta, {{ \Carbon\Carbon::now()->format('d F Y') }}<br>
             Yang Bersangkutan<br><br><br>
             <b>{{ $trip->nama }}</b><br>
             NIP {{ $trip->nip }}
