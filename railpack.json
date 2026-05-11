@@ -1,10 +1,11 @@
 {
   "$schema": "https://railway.com/railpack.schema.json",
   "build": {
+    "aptPackages": ["php8.2-gd"],
     "commands": {
       "install": "composer install --no-dev --optimize-autoloader --no-interaction",
       "npm": "npm install && npm run build",
-      "prepare": "mkdir -p storage/framework/{sessions,views,cache,testing} storage/logs bootstrap/cache && chmod -R a+rw storage bootstrap/cache && apt-get update && apt-get install -y php8.2-gd || true",
+      "prepare": "mkdir -p storage/framework/{sessions,views,cache,testing} storage/logs bootstrap/cache && chmod -R a+rw storage bootstrap/cache",
       "optimize": "php artisan config:cache && php artisan route:cache && php artisan view:cache"
     }
   },

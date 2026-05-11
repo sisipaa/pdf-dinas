@@ -351,21 +351,37 @@ class TripController extends Controller
         }
     }
 
-    public function downloadPdf($id)
-    {
-        $trip = Trip::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+    public function downloadPerType($id, $type)
+{
+    $trip = Trip::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
 
-        if (!$trip->file_pdf || !file_exists(storage_path('app/public/' . $trip->file_pdf))) {
-            if ($trip->type === 'dalam_negeri') {
-                return $this->generatePdfDalamNegeri($id);
-            } else {
-                return $this->generatePdfLuarNegeri($id);
-            }
-        }
+    $viewMap = [
+        'spd' => 'trips.dalam-negeri.partials.spd',
+        'rincian' => 'trips.dalam-negeri.partials.rincian',
+        'kwitansi' => 'trips.dalam-negeri.partials.kwitansi',
+        'riil' => 'trips.dalam-negeri.partials.riil',
+        'perjalanan' => 'trips.dalam-negeri.partials.perjalanan',
+        'nominatif' => 'trips.dalam-negeri.partials.nominatif',
+        'semua' => 'trips.dalam-negeri.pdf',
+    ];
 
-        $filePath = storage_path('app/public/' . $trip->file_pdf);
-        return response()->download($filePath);
+    if (!isset($viewMap[$type])) {
+        abort(404, 'Tipe surat tidak ditemukan');
     }
+
+    try {
+        $html = view($viewMap[$type], compact('trip'))->render();
+        $pdf = PDF::loadHTML($html);
+        $pdf->setPaper('A4', 'portrait');
+        return $pdf->download('surat_dinas_' . $type . '_' . $trip->id . '.pdf');
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ], 500);
+    }
+}
 
     // ==================== HELPER ====================
 
