@@ -47,6 +47,9 @@ Route::get('/test-full-pdf-ln', function() {
 // Download PDF per tipe
 Route::get('/trips/{id}/download/{type}', [TripController::class, 'downloadPerType'])->name('trips.download.type');
 
+Route::get('/phpinfo', function() {
+    phpinfo();
+});
 
 // Guest routes
 Route::middleware('guest')->group(function () {

@@ -1,7 +1,7 @@
 {
   "$schema": "https://railway.com/railpack.schema.json",
   "build": {
-    "aptPackages": ["php8.2-gd"],
+    "aptPackages": ["php8.2-gd", "php-gd"],
     "commands": {
       "install": "composer install --no-dev --optimize-autoloader --no-interaction",
       "npm": "npm install && npm run build",
