@@ -96,8 +96,9 @@
             <td width="40%" class="center">
                 Jakarta, {{ \Carbon\Carbon::now()->format('d F Y') }}<br>
                 Pejabat Pembuat Komitmen<br><br>
-                @if(file_exists(public_path('qr.png')))
-                    <img src="{{ public_path('qr.png') }}" width="80"><br>
+                @php $qrPath = public_path('qr.png'); @endphp
+                @if(file_exists($qrPath))
+                    <img src="{{ imageToBase64($qrPath) }}" width="80"><br>
                 @endif
                 (____________________)
             </td>

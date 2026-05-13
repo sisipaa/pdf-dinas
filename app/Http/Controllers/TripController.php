@@ -318,23 +318,33 @@ class TripController extends Controller
 
     // ==================== PDF GENERATION ====================
 
-     public function generatePdfDalamNegeri($id)
-    {
-        $trip = Trip::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+    public function generatePdfDalamNegeri($id)
+{
+    $trip = Trip::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
 
-        try {
-            $html = view('trips.dalam-negeri.pdf', compact('trip'))->render();
-            $pdf = PDF::loadHTML($html);
-            $pdf->setPaper('A4', 'portrait');
-            return $pdf->download('surat_dinas_dalam_negeri_' . $trip->id . '.pdf');
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-            ], 500);
-        }
+    try {
+        $html = view('trips.dalam-negeri.pdf', compact('trip'))->render();
+        
+        $pdf = PDF::loadHTML($html);
+        $pdf->setPaper('A4', 'portrait');
+        
+        // Set options untuk hindari GD
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isPhpEnabled' => true,
+            'dpi' => 150,
+            'defaultFont' => 'sans-serif',
+        ]);
+        
+        return $pdf->download('surat_dinas_dalam_negeri_' . $trip->id . '.pdf');
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ], 500);
     }
+}
 
 
     public function generatePdfLuarNegeri($id)
@@ -382,6 +392,23 @@ class TripController extends Controller
         ], 500);
     }
 }
+
+    public function downloadPdf($id)
+{
+    $trip = Trip::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+
+    if (!$trip->file_pdf || !file_exists(storage_path('app/public/' . $trip->file_pdf))) {
+        if ($trip->type === 'dalam_negeri') {
+            return $this->generatePdfDalamNegeri($id);
+        } else {
+            return $this->generatePdfLuarNegeri($id);
+        }
+    }
+
+    $filePath = storage_path('app/public/' . $trip->file_pdf);
+    return response()->download($filePath);
+}
+
 
     // ==================== HELPER ====================
 

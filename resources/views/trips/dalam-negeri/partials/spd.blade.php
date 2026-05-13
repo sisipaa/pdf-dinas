@@ -1,5 +1,12 @@
 <div class="center">
-    <img src="{{ public_path('logo.png') }}" width="80"><br>
+    @php
+        $logoPath = public_path('logo.png');
+        $qrPath = public_path('qr.png');
+    @endphp
+    
+    @if(file_exists($logoPath))
+        <img src="{{ imageToBase64($logoPath) }}" width="80"><br>
+    @endif
     <b>BADAN KARANTINA INDONESIA</b><br>
     Jl. Harsono RM No. 3 Jakarta Selatan
 </div>
@@ -34,7 +41,9 @@ Nomor: {{ $trip->nomor_surat ?? '-' }}
     <tr>
         <td width="50%">
             Pejabat Pembuat Komitmen<br><br>
-            <img src="{{ public_path('qr.png') }}" width="80"><br>
+            @if(file_exists($qrPath))
+                <img src="{{ imageToBase64($qrPath) }}" width="80"><br>
+            @endif
             (____________________)
         </td>
         <td width="50%" class="right">
