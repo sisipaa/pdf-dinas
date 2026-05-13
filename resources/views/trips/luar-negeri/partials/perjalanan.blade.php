@@ -1,18 +1,89 @@
-<b>I. Berangkat dari:</b> {{ $trip->tempat_keberangkatan }} (Indonesia)<br>
-<b>Ke:</b> {{ $trip->tujuan }}<br>
-<b>Tanggal:</b> {{ \Carbon\Carbon::parse($trip->tanggal_keberangkatan)->translatedFormat('d F Y') }}
+<div class="title text-center">
+    LAPORAN PERJALANAN DINAS
+</div>
+
+<table>
+
+    <tr>
+        <td width="30%">Nama</td>
+        <td>: {{ $trip->nama }}</td>
+    </tr>
+
+    <tr>
+        <td>NIP</td>
+        <td>: {{ $trip->nip }}</td>
+    </tr>
+
+    <tr>
+        <td>Jabatan</td>
+        <td>: {{ $trip->jabatan }}</td>
+    </tr>
+
+    <tr>
+        <td>Negara Tujuan</td>
+        <td>: {{ $trip->tujuan }}</td>
+    </tr>
+
+    <tr>
+        <td>Tanggal Berangkat</td>
+        <td>: {{ $trip->tanggal_keberangkatan }}</td>
+    </tr>
+
+    <tr>
+        <td>Tanggal Kembali</td>
+        <td>: {{ $trip->tanggal_kembali }}</td>
+    </tr>
+
+</table>
+
+<br>
+
+<table class="border">
+
+    <tr>
+        <td class="border" height="300">
+
+            <b>HASIL PERJALANAN DINAS:</b>
+
+            <br><br>
+
+            {{ $trip->maksud_perjalanan }}
+
+            <br><br><br>
+
+            ....................................................................
+
+            <br><br>
+
+            ....................................................................
+
+            <br><br>
+
+            ....................................................................
+
+        </td>
+    </tr>
+
+</table>
 
 <br><br>
 
-<b>II. Tiba di:</b> {{ $trip->tujuan }}<br>
-<b>Tanggal:</b> {{ \Carbon\Carbon::parse($trip->tanggal_keberangkatan)->translatedFormat('d F Y') }}
+<table>
 
-<br><br>
+    <tr>
 
-<b>III. Kembali ke:</b> {{ $trip->tempat_keberangkatan }} (Indonesia)<br>
-<b>Tanggal:</b> {{ \Carbon\Carbon::parse($trip->tanggal_kembali)->translatedFormat('d F Y') }}
+        <td width="60%"></td>
 
-<br><br>
+        <td class="text-center">
 
-<b>Pejabat Pembuat Komitmen</b><br><br><br>
-(____________________)
+            Pelaksana Perjalanan Dinas
+
+            <br><br><br><br>
+
+            <b>{{ $trip->nama }}</b>
+
+        </td>
+
+    </tr>
+
+</table>

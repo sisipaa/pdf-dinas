@@ -2,53 +2,70 @@
 <html>
 <head>
 <meta charset="UTF-8">
+
 <style>
-    body { 
-        font-family: "Times New Roman", Times, serif; 
-        font-size: 12pt; 
-        margin: 0;
-        padding: 20px;
+    @page {
+        margin: 25px 30px;
     }
-    .page-break { 
-        page-break-after: always; 
+
+    body {
+        font-family: "Times New Roman", Times, serif;
+        font-size: 11pt;
+        color: #000;
+        line-height: 1.2;
     }
-    table { 
-        width: 100%; 
-        border-collapse: collapse; 
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
     }
-    td, th { 
-        padding: 6px; 
+
+    td, th {
+        padding: 4px;
         vertical-align: top;
     }
-    .border td, .border th {
-        border: 1px solid black;
+
+    .border td,
+    .border th {
+        border: 1px solid #000;
     }
-    .center { 
-        text-align: center; 
+
+    .center {
+        text-align: center;
     }
-    .right { 
-        text-align: right; 
+
+    .right {
+        text-align: right;
     }
-</style>
-</head>
-<body>
 
-@include('trips.dalam-negeri.partials.spd')
-<div class="page-break"></div>
+    .justify {
+        text-align: justify;
+    }
 
-@include('trips.dalam-negeri.partials.rincian')
+    .bold {
+        font-weight: bold;
+    }
 
-@include('trips.dalam-negeri.partials.perjalanan')
-<div class="page-break"></div>
+    .small {
+        font-size: 10pt;
+    }
 
-@include('trips.dalam-negeri.partials.kwitansi')
-<div class="page-break"></div>
+    .judul {
+        text-align: center;
+        font-weight: bold;
+        font-size: 13pt;
+    }
 
-@include('trips.dalam-negeri.partials.riil')
-<div class="page-break"></div>  
+    .page-break {
+        page-break-after: always;
+    }
 
-@include('trips.dalam-negeri.partials.nominatif')
-<div class="page-break"></div>  
+    .no-border td {
+        border: none !important;
+    }
 
-</body>
-</html> 
+    hr {
+        border: 0;
+        border-top: 1px solid #000;
+        margin: 5px 0;
+</html>

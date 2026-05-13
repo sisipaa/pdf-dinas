@@ -320,46 +320,73 @@ class TripController extends Controller
 
     public function generatePdfDalamNegeri($id)
 {
-    $trip = Trip::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+    $trip = Trip::where('id', $id)
+        ->where('user_id', Auth::id())
+        ->firstOrFail();
 
     try {
-        $html = view('trips.dalam-negeri.pdf', compact('trip'))->render();
-        
-        $pdf = PDF::loadHTML($html);
-        $pdf->setPaper('A4', 'portrait');
-        
-        // Set options untuk hindari GD
+
+        $pdf = PDF::loadView('trips.dalam-negeri.pdf', compact('trip'))
+            ->setPaper('A4', 'portrait');
+
         $pdf->setOptions([
             'isHtml5ParserEnabled' => true,
             'isPhpEnabled' => true,
             'dpi' => 150,
-            'defaultFont' => 'sans-serif',
+            'defaultFont' => 'Times New Roman',
+            'isRemoteEnabled' => true,
         ]);
-        
-        return $pdf->download('surat_dinas_dalam_negeri_' . $trip->id . '.pdf');
+
+        return $pdf->download(
+            'surat_dinas_dalam_negeri_' . $trip->id . '.pdf'
+        );
+
     } catch (\Exception $e) {
+
         return response()->json([
             'error' => $e->getMessage(),
             'file' => $e->getFile(),
             'line' => $e->getLine(),
         ], 500);
+
     }
 }
 
-
     public function generatePdfLuarNegeri($id)
-    {
-        $trip = Trip::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+{
+    $trip = Trip::where('id', $id)
+        ->where('user_id', Auth::id())
+        ->firstOrFail();
 
-        try {
-            $html = view('trips.luar-negeri.pdf', compact('trip'))->render();
-            $pdf = PDF::loadHTML($html);
-            $pdf->setPaper('A4', 'portrait');
-            return $pdf->download('surat_dinas_luar_negeri_' . $trip->id . '.pdf');
-        } catch (\Exception $e) {
-            return back()->with('error', 'PDF Error: ' . $e->getMessage());
-        }
+    try {
+
+        $pdf = PDF::loadView(
+            'trips.luar-negeri.pdf',
+            compact('trip')
+        )->setPaper('A4', 'portrait');
+
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isPhpEnabled' => true,
+            'isRemoteEnabled' => true,
+            'dpi' => 150,
+            'defaultFont' => 'Times New Roman',
+        ]);
+
+        return $pdf->download(
+            'surat_dinas_luar_negeri_' . $trip->id . '.pdf'
+        );
+
+    } catch (\Exception $e) {
+
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ], 500);
+
     }
+}
 
     public function downloadPerType($id, $type)
 {
@@ -408,6 +435,7 @@ class TripController extends Controller
     $filePath = storage_path('app/public/' . $trip->file_pdf);
     return response()->download($filePath);
 }
+
 
 
     // ==================== HELPER ====================

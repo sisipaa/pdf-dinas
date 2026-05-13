@@ -1,54 +1,110 @@
-<div class="center"><b>DAFTAR PENGELUARAN RIIL PERJALANAN DINAS LUAR NEGERI</b></div>
+<div class="title text-center">
+    DAFTAR PENGELUARAN RIIL
+</div>
 
-<br>
+<table>
+    <tr>
+        <td width="30%">Nama</td>
+        <td>: {{ $trip->nama }}</td>
+    </tr>
 
-Nama: {{ $trip->nama }}<br>
-NIP: {{ $trip->nip }}<br>
-Negara Tujuan: {{ $trip->tujuan }}<br>
+    <tr>
+        <td>NIP</td>
+        <td>: {{ $trip->nip }}</td>
+    </tr>
+
+    <tr>
+        <td>Tujuan</td>
+        <td>: {{ $trip->tujuan }}</td>
+    </tr>
+
+    <tr>
+        <td>Lama Perjalanan</td>
+        <td>: {{ $trip->lama_hari }} Hari</td>
+    </tr>
+</table>
 
 <br>
 
 <table class="border">
-    <tr>
-        <th>No</th><th>Uraian</th><th>Jumlah</th>
-    </tr>
-    <tr>
-        <td>1</td><td>Transport (Berangkat + Pulang)</td>
-        <td class="right">USD {{ number_format(($trip->biaya_transport_berangkat ?? 0) + ($trip->biaya_transport_pulang ?? 0),2,',','.') }}</td>
-    </tr>
-    <tr>
-        <td>2</td><td>Uang Harian ({{ $trip->lama_hari }} hari)</td>
-        <td class="right">USD {{ number_format($trip->total_uang_harian,2,',','.') }}</td>
-    </tr>
-    <tr>
-        <td>3</td><td>Uang Representasi</td>
-        <td class="right">Rp {{ number_format($trip->total_uang_representasi ?? 0,0,',','.') }}</td>
-    </tr>
-    <tr>
-        <td>4</td><td>Hotel</td>
-        <td class="right">USD {{ number_format($trip->biaya_hotel,2,',','.') }}</td>
-    </tr>
-    <tr style="background:#f2f2f2;">
-        <td colspan="2"><b>TOTAL (USD)</b></td>
-        <td class="right"><b>USD {{ number_format($trip->total_biaya,2,',','.') }}</b></td>
-    </tr>
-    <tr>
-        <td colspan="2"><b>TOTAL (IDR - Kurs Rp15.000)</b></td>
-        <td class="right"><b>Rp {{ number_format($trip->total_biaya * 15000,0,',','.') }}</b></td>
-    </tr>
+    <thead>
+        <tr>
+            <th class="border">No</th>
+            <th class="border">Uraian</th>
+            <th class="border">Jumlah</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        <tr>
+            <td class="border text-center">1</td>
+            <td class="border">
+                Tiket Berangkat
+            </td>
+            <td class="border">
+                Rp {{ number_format($trip->biaya_transport_berangkat,0,',','.') }}
+            </td>
+        </tr>
+
+        <tr>
+            <td class="border text-center">2</td>
+            <td class="border">
+                Tiket Pulang
+            </td>
+            <td class="border">
+                Rp {{ number_format($trip->biaya_transport_pulang,0,',','.') }}
+            </td>
+        </tr>
+
+        <tr>
+            <td class="border text-center">3</td>
+            <td class="border">
+                Hotel/Penginapan
+            </td>
+            <td class="border">
+                Rp {{ number_format($trip->biaya_hotel,0,',','.') }}
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2" class="border">
+                <b>TOTAL</b>
+            </td>
+
+            <td class="border">
+                <b>
+                    Rp {{
+                        number_format(
+                            $trip->biaya_transport_berangkat +
+                            $trip->biaya_transport_pulang +
+                            $trip->biaya_hotel,
+                            0,
+                            ',',
+                            '.'
+                        )
+                    }}
+                </b>
+            </td>
+        </tr>
+
+    </tbody>
 </table>
 
 <br><br>
 
-<table width="100%">
+<table>
     <tr>
-        <td width="50%">
-            Mengetahui<br><br><br><br>
-            (____________________)
+        <td width="60%"></td>
+
+        <td class="text-center">
+
+            Yang Membuat Pernyataan,
+
+            <br><br><br><br>
+
+            <b>{{ $trip->nama }}</b>
+
         </td>
-        <td width="50%" class="right">
-            Yang membuat<br><br><br><br>
-            {{ $trip->nama }}
-        </td>
-    </table>
+    </tr>
 </table>

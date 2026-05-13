@@ -1,32 +1,49 @@
-<div class="center"><b>KWITANSI PERJALANAN DINAS LUAR NEGERI</b></div>
+<div class="title text-center">
+    KWITANSI PEMBAYARAN
+</div>
 
-<br>
-
-Sudah terima dari: Pejabat Pembuat Komitmen<br>
-Uang sebesar: <b>USD {{ number_format($trip->total_biaya,2,',','.') }}</b><br>
-(Rp {{ number_format($trip->total_biaya * 15000,0,',','.') }} Rupiah)
-
-<br><br>
-
-Terbilang:
-<b>{{ ucfirst(app(\App\Http\Controllers\TripController::class)->terbilang($trip->total_biaya * 15000)) }} Rupiah</b>
-
-<br><br>
-
-Untuk pembayaran perjalanan dinas luar negeri dari:
-{{ $trip->tempat_keberangkatan }} (Indonesia) ke {{ $trip->tujuan }}
-
-<br><br><br>
-
-<table width="100%">
+<table>
     <tr>
-        <td width="50%">
-            PPK<br><br><br><br>
-            (____________________)
+        <td width="30%">Sudah Terima Dari</td>
+        <td>: Kementerian Luar Negeri</td>
+    </tr>
+
+    <tr>
+        <td>Untuk Pembayaran</td>
+        <td>: Perjalanan Dinas Luar Negeri</td>
+    </tr>
+
+    <tr>
+        <td>Nama</td>
+        <td>: {{ $trip->nama }}</td>
+    </tr>
+
+    <tr>
+        <td>Total Pembayaran</td>
+        <td>
+            : Rp {{ number_format($trip->total_biaya,0,',','.') }}
         </td>
-        <td width="50%" class="right">
-            Yang menerima<br><br><br><br>
-            {{ $trip->nama }}
+    </tr>
+</table>
+
+<br><br>
+
+<table>
+    <tr>
+        <td width="60%"></td>
+
+        <td class="text-center">
+            Yang Menerima,
+
+            <br><br><br>
+
+            @if(file_exists(public_path('qr.png')))
+                <img src="{{ public_path('qr.png') }}" width="70">
+            @endif
+
+            <br>
+
+            <b>{{ $trip->nama }}</b>
         </td>
     </tr>
 </table>
