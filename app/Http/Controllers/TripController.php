@@ -326,15 +326,19 @@ class TripController extends Controller
 
     try {
 
-        $pdf = PDF::loadView('trips.dalam-negeri.pdf', compact('trip'))
-            ->setPaper('A4', 'portrait');
+        $pdf = PDF::loadView(
+            'trips.dalam-negeri.pdf',
+            compact('trip')
+        );
+
+        $pdf->setPaper('A4', 'portrait');
 
         $pdf->setOptions([
             'isHtml5ParserEnabled' => true,
             'isPhpEnabled' => true,
+            'isRemoteEnabled' => true,
             'dpi' => 150,
             'defaultFont' => 'Times New Roman',
-            'isRemoteEnabled' => true,
         ]);
 
         return $pdf->download(
@@ -361,9 +365,10 @@ class TripController extends Controller
     try {
 
         $pdf = PDF::loadView(
-            'trips.luar-negeri.pdf',
-            compact('trip')
-        )->setPaper('A4', 'portrait');
+        'trips.luar-negeri.pdf',
+        compact('trip')
+     );
+        $pdf->setPaper('A4', 'portrait');
 
         $pdf->setOptions([
             'isHtml5ParserEnabled' => true,

@@ -58,5 +58,18 @@
     </tr>
 </table>
 
-<br>
+<br><br>
+
+<table class="no-border">
+    <tr>
+        <td width="60%"></td>
+
+        <td class="center">
+            Yang Menerima,
+
+            <br><br><br><br><br>
+
+            <b>{{ $trip->nama }}</b>
+        </td>
+    </tr>
 </table>

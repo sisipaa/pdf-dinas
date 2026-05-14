@@ -47,6 +47,16 @@
         hr{
             border:1px solid black;
         }
+
+        /* LANDSCAPE UNTUK NOMINATIF */
+        @page landscapePage {
+            size: A4 landscape;
+            margin: 20px;
+        }
+
+        .landscape-page {
+            page: landscapePage;
+        }
     </style>
 </head>
 
@@ -68,7 +78,9 @@
 
     <div class="page-break"></div>
 
-    @include('trips.luar-negeri.partials.nominatif')
+    <div class="landscape-page">
+        @include('trips.luar-negeri.partials.nominatif')
+    </div>
 
     <div class="page-break"></div>
 
